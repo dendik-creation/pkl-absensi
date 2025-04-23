@@ -9,6 +9,12 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    // Registered roles
+    const ALLOWED_ROLES = ['STUDENT', 'SUPERVISOR', 'ADMIN'];
+    const ADMIN_ROLE = 'ADMIN';
+    const STUDENT_ROLE = 'STUDENT';
+    const SUPERVISOR_ROLE = 'SUPERVISOR';
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -17,10 +23,8 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
+    protected $guarded = [
+        'id',
     ];
 
     /**
@@ -30,7 +34,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
@@ -41,7 +44,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
