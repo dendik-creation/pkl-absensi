@@ -6,6 +6,7 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@vitejs/plugin-react": "^4.3.4",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
@@ -13,5 +14,11 @@
         "postcss": "^8.4.47",
         "tailwindcss": "^3.4.13",
         "vite": "^6.0.11"
+    },
+    "dependencies": {
+        "@inertiajs/progress": "^0.1.2",
+        "@inertiajs/react": "^2.0.8",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     }
 }
