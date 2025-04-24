@@ -1,3 +1,5 @@
+import { MainLayout } from "@/Layouts/MainLayout";
+
 export default function Index() {
-    return <h1>Hello from Inertia + TSX</h1>;
+    return <MainLayout>Home</MainLayout>;
 }
