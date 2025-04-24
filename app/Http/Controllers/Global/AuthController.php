@@ -48,4 +48,9 @@ class AuthController extends Controller
             'message' => 'Authentication failed'
         ]);
     }
+
+    public function signOut(){
+        Auth::logout();
+        return Inertia::location('/auth/signin');
+    }
 }
