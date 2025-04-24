@@ -2,7 +2,7 @@ import { useForm } from "@inertiajs/react";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { FiKey, FiLogIn, FiUser } from "react-icons/fi";
+import { FiKey, FiLoader, FiLogIn, FiUser } from "react-icons/fi";
 import ErrorInput from "@/Components/custom/ErrorInput";
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import { Toaster } from "sonner";
@@ -92,8 +92,14 @@ export default function SignIn() {
                             className="w-full p-6 bg-blue-500 hover:bg-blue-600"
                             disabled={processing}
                         >
-                            <span>Masuk</span>
-                            <FiLogIn />
+                            {processing ? (
+                                <FiLoader className="animate-spin" />
+                            ) : (
+                                <span className="flex items-center gap-2">
+                                    <span>Masuk</span>
+                                    <FiLogIn />
+                                </span>
+                            )}
                         </Button>
                     </form>
                 </CardContent>

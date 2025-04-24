@@ -16,13 +16,18 @@ export default function BlastSonner({ type, message }: BlastSonnerProps) {
         case BlastType.SUCCESS:
             return toast.success(message, {
                 richColors: true,
+                icon: "✅",
             });
         case BlastType.ERROR:
             return toast.error(message, {
                 richColors: true,
+                icon: "❌",
             });
         case BlastType.WARNING:
-            return toast(message);
+            return toast.warning(message, {
+                richColors: true,
+                icon: "⚠️",
+            });
         default:
             return toast(message);
     }
