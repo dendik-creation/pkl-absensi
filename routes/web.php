@@ -6,6 +6,7 @@ use Inertia\Inertia;
 
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\StudentController as AdminStudent;
 
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
@@ -23,5 +24,8 @@ Route::middleware('auth')->group(function(){
     // Admin Access
     Route::prefix('admin')->group(function(){
         Route::get('/dashboard', [AdminDashboard::class, 'index']);
+        Route::prefix('/student')->group(function(){
+            Route::get('/', [AdminStudent::class, 'index']);
+        });
     });
 });

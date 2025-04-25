@@ -27,7 +27,10 @@ export default function Header({ title }: { title?: string }) {
                     className="flex font-medium items-center bg-red-200"
                 >
                     {processing ? (
-                        <FiLoader className="animate-spin" size={16} />
+                        <span className="flex items-center gap-2 justify-center">
+                            <FiLoader className="animate-spin" size={16} />
+                            <span>Logout</span>
+                        </span>
                     ) : (
                         <span className="flex items-center gap-2 justify-center">
                             <FiLogOut className="" />

@@ -27,3 +27,17 @@ export const currentTimeCode = () => {
         return "N";
     }
 };
+
+export const inputDebounce = (
+    callback: (...args: any[]) => void,
+    delay: number = 1000
+) => {
+    let timer: NodeJS.Timeout;
+
+    return (...args: any[]) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            callback(...args);
+        }, delay);
+    };
+};

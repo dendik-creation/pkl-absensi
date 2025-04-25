@@ -1,4 +1,3 @@
-import React from "react";
 import { Card } from "@/Components/ui/card";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { currentTime, currentTimeCode } from "@/Services/additionalService";
@@ -29,7 +28,7 @@ export default function AdminDashboard({
         {
             icon: <PiStudentFill size={24} color="#36454F" />,
             label: "Data Siswa",
-            url: "#",
+            url: "/admin/student",
         },
         {
             icon: <HiBuildingStorefront size={24} color="#36454F" />,

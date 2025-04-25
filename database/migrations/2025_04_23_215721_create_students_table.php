@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('nis')->nullable()->unique();
             $table->string('class', 40)->nullable();
             $table->string('major')->nullable();
-            $table->string('email')->nullable()->unique();
             $table->foreignId('workshop_id')->nullable()->constrained('workshops')->onDelete('set null');
             $table->timestamps();
         });

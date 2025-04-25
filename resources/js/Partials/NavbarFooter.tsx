@@ -1,6 +1,5 @@
 import { MenuItem } from "@/Types/menu";
 import { Link } from "@inertiajs/react";
-import React from "react";
 import { FaHome, FaUser, FaCog } from "react-icons/fa";
 
 export default function NavbarFooter() {

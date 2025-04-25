@@ -26,13 +26,13 @@ class DummyUserSeed extends Seeder
             'username' => '1234567890',
             'password' => bcrypt('12345'),
             'role' => 'SUPERVISOR',
+            'email' => 'supervisor@gmail.com'
         ]);
 
         Supervisor::create([
             "user_id" => 2,
             "full_name" => "Supervisor 1",
             "nip" => "1234567890",
-            'email' => 'supervisor@gmail.com'
         ]);
 
         // STD
@@ -40,15 +40,15 @@ class DummyUserSeed extends Seeder
             'username' => '1234',
             'password' => bcrypt('12345'),
             'role' => 'STUDENT',
+            'email' => 'student@gmail.com'
         ]);
 
         Student::create([
             'user_id' => 3,
-            'full_name' => 'Student 1',
-            'nis' => '1234',
+            'full_name' => "Akbar Firdaus Wicaksono",
+            'nis' => '5912',
             'class' => 'XII RPL 1',
             'major' => 'RPL',
-            'email' => 'student@gmail.com'
         ]);
     }
 }
