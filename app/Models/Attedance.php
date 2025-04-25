@@ -15,4 +15,8 @@ class Attedance extends Model
     const ABSENT = 'ABSENT';
     const EXCUSED = 'EXCUSED';
     protected $guarded = ['id'];
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

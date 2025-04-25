@@ -1,12 +1,9 @@
+import { MenuItem } from "@/Types/menu";
+import { Link } from "@inertiajs/react";
 import React from "react";
 import { FaHome, FaUser, FaCog } from "react-icons/fa";
 
 export default function NavbarFooter() {
-    type MenuItem = {
-        icon: React.ReactNode;
-        label: string;
-        url: string;
-    };
     const menuItems: MenuItem[] = [
         {
             icon: <FaHome size={24} />,
@@ -29,7 +26,7 @@ export default function NavbarFooter() {
             {menuItems.map((item, index) => {
                 const isActive = window.location.pathname === item.url;
                 return (
-                    <a
+                    <Link
                         key={index}
                         href={item.url}
                         className={`flex p-2 flex-col items-center ${
@@ -40,7 +37,7 @@ export default function NavbarFooter() {
                     >
                         {item.icon}
                         <span className="text-xs">{item.label}</span>
-                    </a>
+                    </Link>
                 );
             })}
         </div>

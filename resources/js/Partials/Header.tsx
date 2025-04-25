@@ -3,7 +3,7 @@ import React from "react";
 import { FiLoader, FiLogOut } from "react-icons/fi";
 import { useForm } from "@inertiajs/react";
 
-export default function Header() {
+export default function Header({ title }: { title?: string }) {
     const { post, processing } = useForm();
 
     const handleLogout = (e: React.FormEvent) => {
@@ -12,13 +12,13 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-white px-5 flex items-center justify-between border">
+        <header className="bg-white px-5 flex items-center justify-between shadow-xl shadow-white border">
             <img
                 src="/assets/img/smk-bisa-hebat.png"
                 alt="Header Image"
                 className="h-16"
             />
-            <h4 className="font-semibold">PKL Absensi</h4>
+            <h4 className="font-semibold">{title}</h4>
             <form onSubmit={handleLogout}>
                 <Button
                     type="submit"
