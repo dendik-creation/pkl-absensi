@@ -46,15 +46,15 @@ export default function AdminDashboard({
         series: [
             {
                 name: "Hadir",
-                data: [0],
+                data: attendances?.map((attendance) => attendance.present),
             },
             {
                 name: "Izin",
-                data: [0],
+                data: attendances?.map((attendance) => attendance.excused),
             },
             {
                 name: "Alpha",
-                data: [0],
+                data: attendances?.map((attendance) => attendance.absent),
             },
         ],
     };

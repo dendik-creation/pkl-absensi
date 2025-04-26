@@ -3,7 +3,7 @@ import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { FiKey, FiLoader, FiLogIn, FiUser } from "react-icons/fi";
-import ErrorInput from "@/Components/custom/ErrorInput";
+import { ErrorInput } from "@/Components/custom/FormElement";
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import { Toaster } from "sonner";
 
@@ -20,6 +20,7 @@ export default function SignIn() {
         if (!data.username || !data.password) return;
         post("/auth/signin", {
             preserveScroll: true,
+            replace: true,
             onError: (errors) => {
                 return BlastSonner({
                     type: BlastType.ERROR,

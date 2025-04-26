@@ -1,11 +1,17 @@
+import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
+import { DrawerConfirmAction } from "@/Components/custom/FormElement";
 import KeyAndValue from "@/Components/custom/KeyAndValue";
+import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { ymdToIdDate } from "@/Services/additionalService";
 import { Student } from "@/Types/student";
-import { IdCard } from "lucide-react";
+import { Link, useForm } from "@inertiajs/react";
+import { IdCard, Pencil, Trash } from "lucide-react";
+import { useState } from "react";
 import { FaUserGear, FaHourglassHalf } from "react-icons/fa6";
+import { FiLoader } from "react-icons/fi";
 import { HiBuildingStorefront } from "react-icons/hi2";
 
 type AdminStudentShowProps = {
@@ -23,6 +29,26 @@ export default function AdminStudentShow({
     latest_activity,
 }: AdminStudentShowProps) {
     const nowDate = ymdToIdDate(new Date().toDateString());
+    const [deleteDrawerOpen, setDeleteDrawerOpen] = useState<boolean>(false);
+    const [onDelete, setOnDelete] = useState<boolean>(false);
+    const { delete: destroy } = useForm();
+    const handleDelete = (e: React.FormEvent) => {
+        e.preventDefault();
+        setDeleteDrawerOpen(false);
+        setOnDelete(true);
+        destroy(`/admin/student/${student.id}`, {
+            onError: (error) => {
+                setOnDelete(false);
+                BlastSonner({
+                    type: BlastType.ERROR,
+                    message: error.message,
+                });
+            },
+            onFinish: () => {
+                setOnDelete(false);
+            },
+        });
+    };
     return (
         <MainLayout title={title as string}>
             <PageTitle
@@ -30,7 +56,7 @@ export default function AdminStudentShow({
                 description="Detail informasi dan aktivitas"
             />
 
-            <Card className="shadow-md p-4 mb-4 flex flex-col relative">
+            <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
                 <div className="z-10">
                     <div className="flex items-center gap-2 mb-3">
                         <IdCard className="text-slate-500" />
@@ -58,7 +84,7 @@ export default function AdminStudentShow({
                     />
                 </div>
             </Card>
-            <Card className="shadow-md p-4 mb-4 flex flex-col relative">
+            <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
                 <div className="z-10">
                     <div className="flex items-center gap-2 mb-3">
                         <FaUserGear className="text-slate-500" size={18} />
@@ -84,7 +110,7 @@ export default function AdminStudentShow({
                     />
                 </div>
             </Card>
-            <Card className="shadow-md p-4 mb-4 flex flex-col relative">
+            <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
                 <div className="z-10">
                     <div className="flex items-center gap-2 mb-3">
                         <HiBuildingStorefront
@@ -119,7 +145,7 @@ export default function AdminStudentShow({
                     />
                 </div>
             </Card>
-            <Card className="shadow-md p-4 mb-4 flex flex-col relative">
+            <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
                 <div className="z-10">
                     <div className="flex items-center gap-2 mb-3">
                         <FaHourglassHalf className="text-slate-500" size={18} />
@@ -167,6 +193,52 @@ export default function AdminStudentShow({
                     />
                 </div>
             </Card>
+
+            <div className="flex justify-between items-center gap-8 mt-6">
+                <Link
+                    href={"/admin/student/" + student.id + "/edit"}
+                    className="w-full"
+                >
+                    <Button
+                        size={"lg"}
+                        type="button"
+                        variant="outline"
+                        className="w-full bg-blue-200 border mb-5 hover:bg-blue-300 flex justify-center items-center gap-2"
+                    >
+                        <Pencil size={20} />
+                        <span>Edit</span>
+                    </Button>
+                </Link>
+                <div className="w-full">
+                    <Button
+                        size={"lg"}
+                        type="button"
+                        variant="outline"
+                        className="w-full bg-red-200 border mb-5 hover:bg-red-300 flex justify-center items-center gap-2"
+                        onClick={() => setDeleteDrawerOpen(true)}
+                        disabled={onDelete}
+                    >
+                        {onDelete ? (
+                            <span className="flex items-center gap-2">
+                                <FiLoader className="animate-spin" size={20} />
+                                <span>Hapus</span>
+                            </span>
+                        ) : (
+                            <span className="flex items-center gap-2">
+                                <Trash size={20} />
+                                <span>Hapus</span>
+                            </span>
+                        )}
+                    </Button>
+                    <DrawerConfirmAction
+                        title="Konfirmasi Hapus"
+                        description="Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan."
+                        confirmAction={handleDelete}
+                        isOpen={deleteDrawerOpen}
+                        onClose={() => setDeleteDrawerOpen(false)}
+                    />
+                </div>
+            </div>
         </MainLayout>
     );
 }

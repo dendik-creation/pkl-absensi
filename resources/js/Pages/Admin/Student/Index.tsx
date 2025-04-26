@@ -1,13 +1,16 @@
+import { SearchInput } from "@/Components/custom/FormElement";
 import NotFoundInList from "@/Components/custom/NotFoundInList";
-import SearchInput from "@/Components/custom/SearchInput";
+import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { inputDebounce } from "@/Services/additionalService";
 import { Student } from "@/Types/student";
 import { Link, router } from "@inertiajs/react";
-import { ChevronRight } from "lucide-react";
-import { ChangeEvent, useState } from "react";
+import { ChevronRight, PlusCircle } from "lucide-react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { usePage } from "@inertiajs/react";
+import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 
 export type AdminStudentIndexProps = {
     title?: string;
@@ -18,8 +21,16 @@ export default function AdminStudentIndex({
     title,
     students,
 }: AdminStudentIndexProps) {
+    const { flash } = usePage().props as any;
     const [studentsData, setStudentsData] = useState<Student[]>(students);
     const [searchValue, setSearchValue] = useState<string>("");
+
+    if (flash.success) {
+        BlastSonner({
+            type: BlastType.SUCCESS,
+            message: flash.success,
+        });
+    }
 
     const debouncedSearch = inputDebounce(async (value: string) => {
         router.get(
@@ -52,18 +63,26 @@ export default function AdminStudentIndex({
                 className="mb-5"
                 value={searchValue}
                 onChange={handleSearch}
-                placeholder="Cari NIM atau nama siswa"
+                placeholder="Cari NIS atau nama siswa"
             />
+
+            <Link href={"/admin/student/create"}>
+                <Button
+                    size={"lg"}
+                    variant="outline"
+                    className="w-full bg-green-200 border mb-5 hover:bg-green-300 flex justify-center items-center gap-2"
+                >
+                    <PlusCircle size={20} />
+                    <span>Tambah Siswa</span>
+                </Button>
+            </Link>
 
             <div className="grid grid-cols-1">
                 {studentsData.length > 0 ? (
                     studentsData.map((student, index) => (
-                        <Link href={`/admin/student/${student.id}`}>
-                            <Card
-                                key={index}
-                                className="shadow-md p-4 flex items-center justify-between relative"
-                            >
-                                <div className="">
+                        <Link key={index} href={`/admin/student/${student.id}`}>
+                            <Card className="shadow-md p-4 mb-3 flex items-center overflow-hidden justify-between relative">
+                                <div className="z-10">
                                     <h3 className="text-xl font-semibold">
                                         {student.nis ?? "NIM tidak ada"}
                                     </h3>
@@ -74,9 +93,9 @@ export default function AdminStudentIndex({
                                         {student.class ?? "Tanpa kelas"} -{" "}
                                         {student.major ?? "Tanpa jurusan"}
                                     </p>
-                                    <p className="text-sm">
+                                    {/* <p className="text-sm">
                                         {student?.user?.email ?? "Tanpa email"}
-                                    </p>
+                                    </p> */}
                                 </div>
                                 <ChevronRight
                                     size={28}
