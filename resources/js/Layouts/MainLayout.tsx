@@ -20,7 +20,7 @@ export function MainLayout({ children, title, className }: MainLayoutProps) {
             >
                 <Toaster position={"top-center"} />
                 <Header title={title} />
-                <main className="flex-1 overflow-y-auto p-3 relative">
+                <main className="flex-1 overflow-y-auto p-3 mb-20 relative">
                     {children}
                 </main>
                 <NavbarFooter />

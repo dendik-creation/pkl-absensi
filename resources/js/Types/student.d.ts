@@ -1,4 +1,5 @@
 import { User } from "@/Types/user";
+import { Workshop } from "@/Types/workshop";
 
 export type Student = {
     id: number;
@@ -10,6 +11,7 @@ export type Student = {
     email?: string | null;
     workshop_id?: number | null;
     user: User;
+    workshop?: Workshop | null;
     createdAt: Date;
     updatedAt: Date;
 };

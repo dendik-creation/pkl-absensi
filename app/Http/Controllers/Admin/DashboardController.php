@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Attedance;
+use App\Models\Attendance;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -37,11 +36,11 @@ class DashboardController extends Controller
             $daysConsidered = $date->isSameMonth($now) ? $now->day : $date->daysInMonth;
             $expectedTotal = $daysConsidered * $totalStudents;
 
-            $present = Attedance::whereBetween('created_at', [$start, $rangeEnd])
+            $present = Attendance::whereBetween('created_at', [$start, $rangeEnd])
                 ->where('status', 'PRESENT')
                 ->count();
 
-            $excused = Attedance::whereBetween('created_at', [$start, $rangeEnd])
+            $excused = Attendance::whereBetween('created_at', [$start, $rangeEnd])
                 ->where('status', 'EXCUSED')
                 ->count();
 

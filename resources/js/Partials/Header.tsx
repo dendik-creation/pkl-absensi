@@ -12,7 +12,7 @@ export default function Header({ title }: { title?: string }) {
     };
 
     return (
-        <header className="bg-white px-5 flex items-center justify-between shadow-xl shadow-white border">
+        <header className="bg-white px-5 z-[999] flex items-center justify-between shadow-lg shadow-white">
             <img
                 src="/assets/img/smk-bisa-hebat.png"
                 alt="Header Image"

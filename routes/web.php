@@ -26,6 +26,10 @@ Route::middleware('auth')->group(function(){
         Route::get('/dashboard', [AdminDashboard::class, 'index']);
         Route::prefix('/student')->group(function(){
             Route::get('/', [AdminStudent::class, 'index']);
+            Route::get('/{id}', [AdminStudent::class, 'show']);
+            Route::post('/', [AdminStudent::class, 'store']);
+            Route::put('/{id}', [AdminStudent::class, 'update']);
+            Route::delete('/{id}', [AdminStudent::class, 'destroy']);
         });
     });
 });

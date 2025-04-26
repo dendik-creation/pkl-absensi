@@ -42,13 +42,5 @@ class DummyUserSeed extends Seeder
             'role' => 'STUDENT',
             'email' => 'student@gmail.com'
         ]);
-
-        Student::create([
-            'user_id' => 3,
-            'full_name' => "Akbar Firdaus Wicaksono",
-            'nis' => '5912',
-            'class' => 'XII RPL 1',
-            'major' => 'RPL',
-        ]);
     }
 }

@@ -13,10 +13,12 @@ return new class extends Migration {
         Schema::create('workshops', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->nullable();
             $table->string('owner_name')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
             $table->double('latitude')->nullable();
             $table->double('longitude')->nullable();
+            $table->foreignId('supervisor_id')->nullable()->constrained('supervisors')->onDelete('cascade');
             $table->timestamps();
         });
     }

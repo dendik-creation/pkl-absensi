@@ -55,4 +55,14 @@ class User extends Authenticatable
     public function supervisor(){
         return $this->belongsTo(Supervisor::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function journals()
+    {
+        return $this->hasMany(Journal::class);
+    }
 }

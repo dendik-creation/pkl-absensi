@@ -5,7 +5,7 @@ import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { inputDebounce } from "@/Services/additionalService";
 import { Student } from "@/Types/student";
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { ChevronRight } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 
@@ -58,27 +58,33 @@ export default function AdminStudentIndex({
             <div className="grid grid-cols-1">
                 {studentsData.length > 0 ? (
                     studentsData.map((student, index) => (
-                        <Card
-                            key={index}
-                            className="shadow-md p-4 flex items-center justify-between"
-                        >
-                            <div className="">
-                                <h3 className="text-xl font-semibold">
-                                    {student.nis ?? "NIM tidak ada"}
-                                </h3>
-                                <p className="text-base">
-                                    {student?.full_name}
-                                </p>
-                                <p className="text-sm">
-                                    {student.class ?? "Tanpa kelas"} -{" "}
-                                    {student.major ?? "Tanpa jurusan"}
-                                </p>
-                                <p className="text-sm">
-                                    {student?.user?.email ?? "Tanpa email"}
-                                </p>
-                            </div>
-                            <ChevronRight size={28} className="text-gray-500" />
-                        </Card>
+                        <Link href={`/admin/student/${student.id}`}>
+                            <Card
+                                key={index}
+                                className="shadow-md p-4 flex items-center justify-between relative"
+                            >
+                                <div className="">
+                                    <h3 className="text-xl font-semibold">
+                                        {student.nis ?? "NIM tidak ada"}
+                                    </h3>
+                                    <p className="text-base">
+                                        {student?.full_name}
+                                    </p>
+                                    <p className="text-sm">
+                                        {student.class ?? "Tanpa kelas"} -{" "}
+                                        {student.major ?? "Tanpa jurusan"}
+                                    </p>
+                                    <p className="text-sm">
+                                        {student?.user?.email ?? "Tanpa email"}
+                                    </p>
+                                </div>
+                                <ChevronRight
+                                    size={28}
+                                    className="text-blue-400 z-10"
+                                />
+                                <div className="absolute top-0 right-0 w-1/4 h-full bg-gradient-to-l from-blue-100 to-white rounded-l-md"></div>
+                            </Card>
+                        </Link>
                     ))
                 ) : (
                     <NotFoundInList />

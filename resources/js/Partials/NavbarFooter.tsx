@@ -21,7 +21,7 @@ export default function NavbarFooter() {
         },
     ];
     return (
-        <div className="fixed max-w-2xl mx-auto bottom-0 left-0 right-0 bg-white shadow-md border-t flex justify-around items-center py-2">
+        <div className="fixed max-w-2xl z-[999] mx-auto bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center py-2">
             {menuItems.map((item, index) => {
                 const isActive = window.location.pathname === item.url;
                 return (
