@@ -33,7 +33,7 @@ export default function AdminDashboard({
         {
             icon: <HiBuildingStorefront size={24} color="#36454F" />,
             label: "Data DuDi (Bengkel)",
-            url: "#",
+            url: "/admin/workshop",
         },
         {
             icon: <FaUserGear size={24} color="#36454F" />,

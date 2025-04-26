@@ -12,4 +12,9 @@ class Workshop extends Model
     {
         return $this->belongsTo(Supervisor::class, 'supervisor_id');
     }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }

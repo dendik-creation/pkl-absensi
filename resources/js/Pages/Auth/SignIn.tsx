@@ -31,7 +31,7 @@ export default function SignIn() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-background">
+        <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-background">
             <Toaster position={"top-center"} />
             <Card className="w-full max-w-xl shadow-md mx-4">
                 <CardHeader>

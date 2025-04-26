@@ -7,6 +7,7 @@ use Inertia\Inertia;
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\StudentController as AdminStudent;
+use App\Http\Controllers\Admin\WorkshopController as AdminWorkshop;
 
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
@@ -22,16 +23,27 @@ Route::middleware('auth')->group(function(){
     Route::post('auth/signout', [AuthController::class, 'signOut']);
 
     // Admin Access
-    Route::prefix('admin')->group(function(){
+    Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index']);
-        Route::prefix('/student')->group(function(){
-            Route::get('/', [AdminStudent::class, 'index']);
-            Route::get('/create', [AdminStudent::class, 'create']);
-            Route::get('/{id}', [AdminStudent::class, 'show']);
-            Route::get('/{id}/edit', [AdminStudent::class, 'edit']);
-            Route::post('/', [AdminStudent::class, 'store']);
-            Route::put('/{id}', [AdminStudent::class, 'update']);
-            Route::delete('/{id}', [AdminStudent::class, 'destroy']);
+
+        Route::prefix('/student')->controller(AdminStudent::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/create', 'create');
+            Route::get('/{id}', 'show');
+            Route::get('/{id}/edit', 'edit');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+        });
+
+        Route::prefix('/workshop')->controller(AdminWorkshop::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/create', 'create');
+            Route::get('/{id}', 'show');
+            Route::get('/{id}/edit', 'edit');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
         });
     });
 });

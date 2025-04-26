@@ -163,7 +163,7 @@ export function DrawerConfirmAction({
 }) {
     return (
         <Drawer open={isOpen} onOpenChange={onClose}>
-            <DrawerContent className="z-[1000] mb-8">
+            <DrawerContent className="z-[1000] mb-4">
                 <DrawerHeader className="flex flex-col items-start">
                     <DrawerTitle>{title}</DrawerTitle>
                     <DrawerDescription className="text-start">

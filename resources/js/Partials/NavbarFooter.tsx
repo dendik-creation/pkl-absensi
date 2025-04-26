@@ -3,11 +3,12 @@ import { Link } from "@inertiajs/react";
 import { FaHome, FaUser, FaCog } from "react-icons/fa";
 
 export default function NavbarFooter() {
+    const pathame = window.location.pathname;
     const menuItems: MenuItem[] = [
         {
             icon: <FaHome size={24} />,
             label: "Home",
-            url: "#",
+            url: `/${pathame.split("/")[1]}/dashboard`,
         },
         {
             icon: <FaUser size={24} />,
