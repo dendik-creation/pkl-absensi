@@ -14,15 +14,15 @@ export const ymdToIdDate = (
     return format(parsedDate, formatString, { locale: id });
 };
 
-export const currentTime = () => {
+export const currentTimeGreeting = () => {
     const date = new Date();
     const hours = date.getHours();
 
-    if (hours >= 5 && hours < 12) {
+    if (hours >= 5 && hours < 11) {
         return "Pagi 🌤️";
-    } else if (hours >= 12 && hours < 17) {
+    } else if (hours >= 11 && hours < 15) {
         return "Siang 🌞";
-    } else if (hours >= 17 && hours < 18) {
+    } else if (hours >= 15 && hours < 18) {
         return "Sore ⛅";
     } else {
         return "Malam 🌙";
@@ -33,11 +33,11 @@ export const currentTimeCode = () => {
     const date = new Date();
     const hours = date.getHours();
 
-    if (hours >= 5 && hours < 12) {
+    if (hours >= 5 && hours < 11) {
         return "M";
-    } else if (hours >= 12 && hours < 17) {
+    } else if (hours >= 11 && hours < 15) {
         return "A";
-    } else if (hours >= 17 && hours < 18) {
+    } else if (hours >= 15 && hours < 18) {
         return "E";
     } else {
         return "N";

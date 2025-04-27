@@ -1,14 +1,18 @@
 import { Card } from "@/Components/ui/card";
 import { MainLayout } from "@/Layouts/MainLayout";
-import { currentTime, currentTimeCode } from "@/Services/additionalService";
+import {
+    currentTimeCode,
+    currentTimeGreeting,
+} from "@/Services/additionalService";
 import { PiStudentFill } from "react-icons/pi";
-import { BsIncognito } from "react-icons/bs";
 import { FaUserGear } from "react-icons/fa6";
 import { HiBuildingStorefront } from "react-icons/hi2";
 import MenuListInDashboard from "@/Components/custom/MenuListInDashboard";
 import { MenuItem } from "@/Types/menu";
 import clsx from "clsx";
 import { ApexBarChart, ChartNoData } from "@/Components/custom/Charts";
+import { RiAdminLine } from "react-icons/ri";
+import { useEffect, useState } from "react";
 
 type AdminDashboardProps = {
     title?: string;
@@ -24,6 +28,23 @@ export default function AdminDashboard({
     title,
     attendances,
 }: AdminDashboardProps) {
+    const [currentTime, setCurrentTime] = useState(() => {
+        const now = new Date();
+        return { hour: now.getHours(), minute: now.getMinutes() };
+    });
+
+    useEffect(() => {
+        const updateCurrentTime = () => {
+            const now = new Date();
+            setCurrentTime({ hour: now.getHours(), minute: now.getMinutes() });
+        };
+
+        const interval = setInterval(updateCurrentTime, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const currentHour = currentTime.hour;
+    const currentMinute = currentTime.minute;
     const menuItems: MenuItem[] = [
         {
             icon: <PiStudentFill size={24} color="#36454F" />,
@@ -73,9 +94,9 @@ export default function AdminDashboard({
                                 currentTimeCode() === "N" && "to-[#778899]"
                             )}
                         ></div>
-                        <div className="flex items-center mx-6 justify-center relative">
+                        <div className="flex items-center mx-6 justify-center overflow-hidden relative">
                             <div className="rounded-full p-4 bg-blue-100">
-                                <BsIncognito
+                                <RiAdminLine
                                     className="text-blue-600"
                                     size={35}
                                 />
@@ -83,9 +104,28 @@ export default function AdminDashboard({
                         </div>
                         <div className="flex flex-col justify-center relative">
                             <h1 className="text-xl font-bold text-gray-800">
-                                Selamat {currentTime()}
+                                Selamat {currentTimeGreeting()}
                             </h1>
                             <p className="text-lg text-gray-600">Admin</p>
+                        </div>
+                        <div
+                            className={clsx(
+                                "absolute bottom-3 right-8 flex items-start justify-start rotate-90 origin-bottom-right",
+                                currentTimeCode() === "M" && "text-[#8B8000]",
+                                currentTimeCode() === "A" && "text-[#5F9EA0]",
+                                currentTimeCode() === "E" && "text-[#CD5C5C]",
+                                currentTimeCode() === "N" && "text-[#2F4F4F]"
+                            )}
+                        >
+                            <span className="text-2xl font-bold leading-none">
+                                {currentHour}
+                            </span>
+                            <span className="text-2xl font-bold mx-1 leading-none">
+                                {":"}
+                            </span>
+                            <span className="text-2xl font-bold leading-none">
+                                {currentMinute}
+                            </span>
                         </div>
                     </Card>
                 </div>
