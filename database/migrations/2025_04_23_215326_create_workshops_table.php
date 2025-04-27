@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->text('address')->nullable();
             $table->double('latitude')->nullable();
             $table->double('longitude')->nullable();
-            $table->foreignId('supervisor_id')->nullable()->constrained('supervisors')->onDelete('cascade');
+            $table->foreignId('supervisor_id')->nullable()->constrained('supervisors')->onDelete('set null');
             $table->timestamps();
         });
     }

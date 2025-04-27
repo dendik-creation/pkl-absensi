@@ -22,7 +22,7 @@ export default function NotFoundInList({
                 {title ?? "Data tidak ada"}
             </h3>
             <p className="text-muted-foreground">
-                {description ?? "Pencarian tidak menemukan apapun"}
+                {description ?? "Pencarian tidak ditemukan atau data tidak ada"}
             </p>
         </Card>
     );

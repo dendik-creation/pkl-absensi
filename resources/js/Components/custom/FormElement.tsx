@@ -1,4 +1,4 @@
-import { TriangleAlert, Search } from "lucide-react";
+import { TriangleAlert, Search, CircleX } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "../ui/input";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -79,11 +79,13 @@ export function SelectSearchInput({
     options,
     onChange,
     placeholder,
+    removeValue,
 }: {
     value: string;
     options: { label: string; value: string }[];
     onChange: (value: string | number) => void;
     placeholder?: string;
+    removeValue: () => void;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -94,7 +96,7 @@ export function SelectSearchInput({
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full py-6 justify-between"
+                    className="w-full py-6 justify-between relative"
                 >
                     {value ? (
                         <span className="font-normal text-base">
@@ -104,11 +106,24 @@ export function SelectSearchInput({
                             }
                         </span>
                     ) : (
-                        <span className="font-normal text-base">
+                        <span className="font-normal text-slate-500 text-base">
                             {placeholder}
                         </span>
                     )}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    {value != "" && value != undefined ? (
+                        <Button
+                            variant="link"
+                            type="button"
+                            className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                            onClick={(e) => {
+                                removeValue();
+                            }}
+                        >
+                            <CircleX size={20} className="" />
+                        </Button>
+                    ) : (
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    )}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="min-w-[400px] p-0" align="start">

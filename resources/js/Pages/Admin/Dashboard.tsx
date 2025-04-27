@@ -38,7 +38,7 @@ export default function AdminDashboard({
         {
             icon: <FaUserGear size={24} color="#36454F" />,
             label: "Data Pembimbing",
-            url: "#",
+            url: "/admin/supervisor",
         },
     ];
     const attedance = {

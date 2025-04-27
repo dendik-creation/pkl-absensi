@@ -203,6 +203,7 @@ export default function AdminWorkshopEdit({
                                 setData("supervisor_id", value.toString())
                             }
                             placeholder="Pilih Pembimbing"
+                            removeValue={() => setData("supervisor_id", "")}
                         />
                         {errors.supervisor_id && (
                             <ErrorInput error={errors.supervisor_id} />

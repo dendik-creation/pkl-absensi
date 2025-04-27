@@ -5,40 +5,36 @@ import { Input } from "@/Components/ui/input";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { handleNipNisInput } from "@/Services/additionalService";
-import { Student } from "@/Types/student";
+import { Supervisor } from "@/Types/supervisor";
 import { useForm } from "@inertiajs/react";
 import React from "react";
 import { FiLoader, FiSave } from "react-icons/fi";
 
-type AdminStudentEditProps = {
+type AdminSupervisorEditProps = {
     title?: string;
-    student: Student;
+    supervisor: Supervisor;
     workshops: {
         label: string;
         value: string;
     }[];
 };
 
-export default function AdminStudentEdit({
+export default function AdminSupervisorEdit({
     title,
-    student,
+    supervisor,
     workshops,
-}: AdminStudentEditProps) {
+}: AdminSupervisorEditProps) {
     const { data, setData, put, processing, errors, setError, clearErrors } =
         useForm({
-            nis: student.nis || "",
-            full_name: student.full_name || "",
-            class: student.class || "",
-            major: student.major || "",
-            workshop_id: student.workshop_id?.toString() || "",
+            nip: supervisor.nip || "",
+            full_name: supervisor.full_name || "",
+            email: supervisor?.user?.email || "",
+            workshop_id: supervisor?.workshop?.id?.toString() || "",
         });
     const handleErrorInput = () => {
         const fields: { key: keyof typeof data; message: string }[] = [
-            { key: "nis", message: "NIS tidak boleh kosong" },
+            { key: "nip", message: "NIP tidak boleh kosong" },
             { key: "full_name", message: "Nama tidak boleh kosong" },
-            { key: "class", message: "Kelas tidak boleh kosong" },
-            { key: "major", message: "Jurusan tidak boleh kosong" },
-            { key: "workshop_id", message: "Tempat DuDi tidak boleh kosong" },
         ];
 
         let hasError = false;
@@ -65,7 +61,7 @@ export default function AdminStudentEdit({
 
         clearErrors();
 
-        put(`/admin/student/${student.id}`, {
+        put(`/admin/supervisor/${supervisor.id}`, {
             preserveScroll: true,
             replace: true,
             onError: (errors) => {
@@ -83,32 +79,35 @@ export default function AdminStudentEdit({
         <MainLayout title={title as string}>
             <PageTitle
                 title={title as string}
-                description="Perbarui informasi siswa"
+                description="Perbarui data pembimbing"
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                     <div className="flex flex-col">
-                        <label className="text-base mb-1">NIS Siswa</label>
+                        <label className="text-base mb-1">NIP</label>
                         <Input
                             type="text"
-                            placeholder="Masukkan NIS"
-                            value={data.nis}
+                            inputMode="numeric"
+                            placeholder="Masukkan NIP"
+                            value={data.nip}
                             onChange={(e) =>
                                 setData(
-                                    "nis",
+                                    "nip",
                                     handleNipNisInput(e.target.value)
                                 )
                             }
                             className={`py-6 ${
-                                errors.nis ? "border-red-500" : ""
+                                errors.nip ? "border-red-500" : ""
                             }`}
                         />
-                        {errors.nis && <ErrorInput error={errors.nis} />}
+                        {errors.nip && <ErrorInput error={errors.nip} />}
                     </div>
                 </div>
                 <div className="mb-5">
                     <div className="flex flex-col">
-                        <label className="text-base mb-1">Nama Siswa</label>
+                        <label className="text-base mb-1">
+                            Nama Pembimbing
+                        </label>
                         <Input
                             type="text"
                             placeholder="Masukkan Nama Lengkap"
@@ -127,38 +126,25 @@ export default function AdminStudentEdit({
                 </div>
                 <div className="mb-5">
                     <div className="flex flex-col">
-                        <label className="text-base mb-1">Kelas</label>
+                        <label className="text-base mb-1">
+                            Email (Opsional)
+                        </label>
                         <Input
-                            type="text"
-                            placeholder="Masukkan Kelas"
-                            value={data.class}
-                            onChange={(e) => setData("class", e.target.value)}
+                            type="email"
+                            placeholder="Masukkan Email"
+                            value={data.email}
+                            onChange={(e) => setData("email", e.target.value)}
                             className={`py-6 ${
-                                errors.class ? "border-red-500" : ""
+                                errors.email ? "border-red-500" : ""
                             }`}
                         />
-                        {errors.class && <ErrorInput error={errors.class} />}
-                    </div>
-                </div>
-                <div className="mb-5">
-                    <div className="flex flex-col">
-                        <label className="text-base mb-1">Jurusan</label>
-                        <Input
-                            type="text"
-                            placeholder="Masukkan Jurusan"
-                            value={data.major}
-                            onChange={(e) => setData("major", e.target.value)}
-                            className={`py-6 ${
-                                errors.major ? "border-red-500" : ""
-                            }`}
-                        />
-                        {errors.major && <ErrorInput error={errors.major} />}
+                        {errors.email && <ErrorInput error={errors.email} />}
                     </div>
                 </div>
                 <div className="mb-5">
                     <div className="flex flex-col">
                         <label className="text-base mb-1">
-                            Tempat DuDi (Bengkel)
+                            Tempat DuDi (Opsional)
                         </label>
                         <SelectSearchInput
                             value={data.workshop_id}
@@ -176,7 +162,7 @@ export default function AdminStudentEdit({
                 </div>
                 <Button
                     type="submit"
-                    className="w-full mt-4 p-6 bg-blue-500 hover:bg-blue-600"
+                    className="w-full mt-4 p-6 bg-amber-500 hover:bg-amber-600"
                     disabled={processing}
                 >
                     {processing ? (

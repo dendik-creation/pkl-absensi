@@ -81,7 +81,7 @@ class WorkshopController extends Controller
         $workshop = Workshop::with('supervisor', 'students')->findOrFail($id);
 
         return Inertia::render('Admin/Workshop/Show', [
-            'title' => "Informasi Siswa",
+            'title' => "Informasi DuDi",
             'workshop' => $workshop,
         ]);
     }

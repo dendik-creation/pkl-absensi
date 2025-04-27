@@ -4,6 +4,7 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
+import { handleNipNisInput } from "@/Services/additionalService";
 import { useForm } from "@inertiajs/react";
 import React from "react";
 import { FiLoader, FiSave } from "react-icons/fi";
@@ -89,7 +90,12 @@ export default function AdminStudentCreate({
                             type="text"
                             placeholder="Masukkan NIS"
                             value={data.nis}
-                            onChange={(e) => setData("nis", e.target.value)}
+                            onChange={(e) =>
+                                setData(
+                                    "nis",
+                                    handleNipNisInput(e.target.value)
+                                )
+                            }
                             className={`py-6 ${
                                 errors.nis ? "border-red-500" : ""
                             }`}
@@ -158,6 +164,7 @@ export default function AdminStudentCreate({
                                 setData("workshop_id", value.toString())
                             }
                             placeholder="Pilih Tempat DuDi"
+                            removeValue={() => setData("workshop_id", "")}
                         />
                         {errors.workshop_id && (
                             <ErrorInput error={errors.workshop_id} />

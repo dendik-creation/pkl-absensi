@@ -1,4 +1,5 @@
 import { User } from "@/Types/user";
+import { Workshop } from "./workshop";
 
 type Supervisor = {
     id: number;
@@ -6,4 +7,5 @@ type Supervisor = {
     nip?: string;
     full_name: string;
     user: User;
+    workshop: Workshop;
 };

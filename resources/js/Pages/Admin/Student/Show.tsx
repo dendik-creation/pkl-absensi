@@ -95,20 +95,26 @@ export default function AdminStudentShow({
                     </div>
                 </div>
                 <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-blue-100 to-white rounded-l-md"></div>
-                <div className="flex flex-col z-10">
-                    <KeyAndValue
-                        keyIdentifier="NIP"
-                        value={student.workshop?.supervisor?.nip?.toString()}
-                    />
-                    <KeyAndValue
-                        keyIdentifier="Nama"
-                        value={student.workshop?.supervisor?.full_name}
-                    />
-                    <KeyAndValue
-                        keyIdentifier="Email"
-                        value={student.workshop?.supervisor?.user?.email}
-                    />
-                </div>
+                {student.workshop?.supervisor != null ? (
+                    <div className="flex flex-col z-10">
+                        <KeyAndValue
+                            keyIdentifier="NIP"
+                            value={student.workshop?.supervisor?.nip?.toString()}
+                        />
+                        <KeyAndValue
+                            keyIdentifier="Nama"
+                            value={student.workshop?.supervisor?.full_name}
+                        />
+                        <KeyAndValue
+                            keyIdentifier="Email"
+                            value={student.workshop?.supervisor?.user?.email}
+                        />
+                    </div>
+                ) : (
+                    <p className="text-base z-10">
+                        Siswa tidak memiliki pembimbing PKL
+                    </p>
+                )}
             </Card>
             <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
                 <div className="z-10">
@@ -125,7 +131,7 @@ export default function AdminStudentShow({
                         <p className="text-muted font-semibold text-sm"></p>
                     </div>
                 </div>
-                <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-green-100 to-white rounded-l-md"></div>
+                <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-blue-100 to-white rounded-l-md"></div>
                 <div className="flex flex-col z-10">
                     <KeyAndValue
                         keyIdentifier="Nama"
@@ -160,7 +166,7 @@ export default function AdminStudentShow({
                         <p className="text-muted font-semibold text-sm"></p>
                     </div>
                 </div>
-                <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-green-100 to-white rounded-l-md"></div>
+                <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-blue-100 to-white rounded-l-md"></div>
                 <div className="flex flex-col z-10">
                     <div className="mb-2">
                         <p className="text-sm font-semibold text-slate-600">

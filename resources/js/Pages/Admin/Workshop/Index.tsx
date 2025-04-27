@@ -102,7 +102,7 @@ export default function AdminWorkshopIndex({
                                 </div>
                                 <ChevronRight
                                     size={28}
-                                    className="text-blue-400 z-10"
+                                    className="text-green-400 z-10"
                                 />
                                 <div className="absolute top-0 right-0 w-1/4 h-full bg-gradient-to-l from-green-100 to-white rounded-l-md"></div>
                             </Card>

@@ -77,3 +77,11 @@ export const getFullAddress = async (lat: number, lon: number) => {
         return "";
     }
 };
+
+export const handleNipNisInput = (value: string) => {
+    const regex = /^[0-9]+$/;
+    if (!regex.test(value)) {
+        return value.replace(/[^0-9]/g, "");
+    }
+    return value;
+};

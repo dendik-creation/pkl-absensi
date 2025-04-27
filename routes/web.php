@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\StudentController as AdminStudent;
 use App\Http\Controllers\Admin\WorkshopController as AdminWorkshop;
+use App\Http\Controllers\Admin\SupervisorController as AdminSupervisor;
 
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
@@ -37,6 +38,16 @@ Route::middleware('auth')->group(function(){
         });
 
         Route::prefix('/workshop')->controller(AdminWorkshop::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/create', 'create');
+            Route::get('/{id}', 'show');
+            Route::get('/{id}/edit', 'edit');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+        });
+
+        Route::prefix('/supervisor')->controller(AdminSupervisor::class)->group(function () {
             Route::get('/', 'index');
             Route::get('/create', 'create');
             Route::get('/{id}', 'show');
