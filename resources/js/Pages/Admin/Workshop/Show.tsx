@@ -7,7 +7,6 @@ import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { Workshop } from "@/Types/workshop";
 import { Link, useForm } from "@inertiajs/react";
-import { Separator } from "@/Components/ui/separator";
 import { MapPinned, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { FaUserGear } from "react-icons/fa6";

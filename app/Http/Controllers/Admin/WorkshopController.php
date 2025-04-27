@@ -116,7 +116,9 @@ class WorkshopController extends Controller
 
         if($request->supervisor_id != "" && $request->supervisor_id != null){
             $validated['supervisor_id'] = $request->supervisor_id;
-            $supervisorHasWorkshop = Workshop::where('supervisor_id', $request->supervisor_id)->first();
+            $supervisorHasWorkshop = Workshop::where('supervisor_id', $request->supervisor_id)
+            ->where('id', '!=', $id)
+            ->first();
             if($supervisorHasWorkshop){
                 return back()->withErrors([
                     'message' => 'Pembimbing sudah ditugaskan di Dudi lain'

@@ -12,7 +12,7 @@ import { PageTitle } from "@/Partials/PageTitle";
 import MapPicker from "@/Components/custom/MapPicker";
 import "leaflet/dist/leaflet.css";
 import { Textarea } from "@/Components/ui/textarea";
-import axios from "axios";
+import { getFullAddress } from "@/Services/additionalService";
 
 type AdminWorkshopCreateProps = {
     title?: string;
@@ -59,25 +59,6 @@ export default function AdminWorkshopCreate({
         });
 
         return hasError;
-    };
-
-    const getAddress = async (lat: number, lon: number) => {
-        try {
-            const response = await axios.get(
-                `https://nominatim.openstreetmap.org/reverse`,
-                {
-                    params: {
-                        format: "json",
-                        lat: lat,
-                        lon: lon,
-                    },
-                }
-            );
-            return response.data.display_name || "";
-        } catch (error) {
-            console.error("Gagal mengambil alamat:", error);
-            return "";
-        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -193,7 +174,7 @@ export default function AdminWorkshopCreate({
                                 setData("latitude", lat.toString());
                                 setData("longitude", lon.toString());
 
-                                getAddress(lat, lon).then((address) => {
+                                getFullAddress(lat, lon).then((address) => {
                                     if (address) setData("address", address);
                                 });
                             }}

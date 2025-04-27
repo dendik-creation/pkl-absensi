@@ -1,3 +1,4 @@
+import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
@@ -55,4 +56,24 @@ export const inputDebounce = (
             callback(...args);
         }, delay);
     };
+};
+
+export const getFullAddress = async (lat: number, lon: number) => {
+    try {
+        const response = await axios.get(
+            `https://nominatim.openstreetmap.org/reverse`,
+            {
+                params: {
+                    format: "json",
+                    lat: lat,
+                    lon: lon,
+                    "accept-language": "id",
+                },
+            }
+        );
+        return response.data.display_name || "";
+    } catch (error) {
+        console.error("Gagal mengambil alamat:", error);
+        return "";
+    }
 };
