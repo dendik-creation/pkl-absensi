@@ -89,6 +89,7 @@ export default function AdminWorkshopCreate({
             <PageTitle
                 title={title || "Tambah Workshop"}
                 description="Mendaftarkan DuDi baru ke sistem"
+                backUrl="/admin/workshop"
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">

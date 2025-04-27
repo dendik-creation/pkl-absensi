@@ -84,6 +84,7 @@ export default function AdminStudentEdit({
             <PageTitle
                 title={title as string}
                 description="Perbarui informasi siswa"
+                backUrl={`/admin/student/${student.id}`}
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">

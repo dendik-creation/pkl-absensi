@@ -51,6 +51,7 @@ export default function AdminSupervisorShow({
             <PageTitle
                 title={title as string}
                 description="Detail informasi pembimbing"
+                backUrl="/admin/supervisor"
             />
 
             <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">

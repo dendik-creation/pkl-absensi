@@ -77,6 +77,7 @@ export default function AdminSupervisorCreate({
             <PageTitle
                 title={title as string}
                 description="Menambahkan pembimbing baru ke sistem"
+                backUrl="/admin/supervisor"
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">

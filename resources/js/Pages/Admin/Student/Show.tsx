@@ -54,6 +54,7 @@ export default function AdminStudentShow({
             <PageTitle
                 title={title as string}
                 description="Detail informasi dan aktivitas"
+                backUrl="/admin/student"
             />
 
             <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">

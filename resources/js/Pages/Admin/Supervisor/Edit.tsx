@@ -80,6 +80,7 @@ export default function AdminSupervisorEdit({
             <PageTitle
                 title={title as string}
                 description="Perbarui data pembimbing"
+                backUrl={`/admin/supervisor/${supervisor.id}`}
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">
