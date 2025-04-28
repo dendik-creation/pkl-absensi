@@ -81,7 +81,6 @@ export default function AdminStudentCreate({
             <PageTitle
                 title={title as string}
                 description="Menambahkan siswa baru ke sistem"
-                backUrl="/admin/student"
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">

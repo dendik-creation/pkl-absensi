@@ -58,7 +58,6 @@ export default function AdminSupervisorIndex({
             <PageTitle
                 title={title as string}
                 description="Data pembinbing yang bertugas di DuDi"
-                backUrl="/admin/dashboard"
             />
 
             <SearchInput

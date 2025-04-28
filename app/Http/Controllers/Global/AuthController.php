@@ -13,13 +13,13 @@ class AuthController extends Controller
 {
     public function SignedInStatus(){
         $auth = Auth::user();
-        if(!$auth) return Inertia::location('auth/signin');
+        if(!$auth) return Inertia::location('/auth/signin');
 
         // Redirect By Role
         $role = $auth->role;
-        if($role == 'ADMIN') return Inertia::location('admin/dashboard');
-        if($role == 'STUDENT') return Inertia::location('student/dashboard');
-        if($role == 'SUPERVISOR') return Inertia::location('supervisor/dashboard');
+        if($role == 'ADMIN') return Inertia::location('/admin/dashboard');
+        if($role == 'STUDENT') return Inertia::location('/student/dashboard');
+        if($role == 'SUPERVISOR') return Inertia::location('/supervisor/dashboard');
     }
 
     public function signIn(Request $request){
