@@ -8,9 +8,9 @@ class Supervisor extends Model
 {
     protected $guarded = ['id'];
 
-    public function workshop()
+public function workshops()
     {
-        return $this->hasOne(Workshop::class);
+        return $this->hasMany(Workshop::class);
     }
 
     public function user()

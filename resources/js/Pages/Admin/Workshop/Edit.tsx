@@ -152,6 +152,26 @@ export default function AdminWorkshopEdit({
                 <div className="mb-5">
                     <div className="flex flex-col">
                         <label className="text-base mb-1">
+                            Pembimbing PKL yang ditugaskan (Bisa nanti)
+                        </label>
+                        <SelectSearchInput
+                            value={data.supervisor_id}
+                            options={supervisors}
+                            onChange={(value) =>
+                                setData("supervisor_id", value.toString())
+                            }
+                            placeholder="Pilih Pembimbing"
+                            removeValue={() => setData("supervisor_id", "")}
+                        />
+                        {errors.supervisor_id && (
+                            <ErrorInput error={errors.supervisor_id} />
+                        )}
+                    </div>
+                </div>
+
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">
                             Alamat Lengkap (Gunakan peta untuk memilih lokasi)
                         </label>
                         <Textarea
@@ -188,26 +208,6 @@ export default function AdminWorkshopEdit({
 
                         {errors.latitude && errors.longitude && (
                             <ErrorInput error="Tentukan koordinat DuDi" />
-                        )}
-                    </div>
-                </div>
-
-                <div className="mb-5">
-                    <div className="flex flex-col">
-                        <label className="text-base mb-1">
-                            Pembimbing PKL yang ditugaskan (Opsional)
-                        </label>
-                        <SelectSearchInput
-                            value={data.supervisor_id}
-                            options={supervisors}
-                            onChange={(value) =>
-                                setData("supervisor_id", value.toString())
-                            }
-                            placeholder="Pilih Pembimbing"
-                            removeValue={() => setData("supervisor_id", "")}
-                        />
-                        {errors.supervisor_id && (
-                            <ErrorInput error={errors.supervisor_id} />
                         )}
                     </div>
                 </div>

@@ -3,15 +3,14 @@ import { DrawerConfirmAction } from "@/Components/custom/FormElement";
 import KeyAndValue from "@/Components/custom/KeyAndValue";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
+import { Separator } from "@/Components/ui/separator";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { ymdToIdDate } from "@/Services/additionalService";
-import { Student } from "@/Types/student";
 import { Supervisor } from "@/Types/supervisor";
 import { Link, useForm } from "@inertiajs/react";
 import { ChevronRight, IdCard, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
-import { FaUserGear, FaHourglassHalf } from "react-icons/fa6";
 import { FiLoader } from "react-icons/fi";
 import { HiBuildingStorefront } from "react-icons/hi2";
 import { PiStudentFill } from "react-icons/pi";
@@ -80,7 +79,7 @@ export default function AdminSupervisorShow({
                     />
                 </div>
             </Card>
-            {supervisor?.workshop != null ? (
+            {supervisor?.workshops != null ? (
                 <div className="">
                     <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
                         <div className="z-10">
@@ -90,7 +89,8 @@ export default function AdminSupervisorShow({
                                     size={18}
                                 />
                                 <h3 className="text-lg font-semibold">
-                                    Tempat Bertugas (DuDi)
+                                    Tempat DuDi (
+                                    {supervisor.workshops?.length ?? 0})
                                 </h3>
                             </div>
                             <div className="flex flex-col gap-1">
@@ -98,29 +98,49 @@ export default function AdminSupervisorShow({
                             </div>
                         </div>
                         <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-amber-100 to-white rounded-l-md"></div>
-                        <div className="flex flex-col z-10">
-                            <Link
-                                className="flex items-center gap-2 justify-start text-amber-700                        hover:text-amber-800"
-                                href={`/admin/workshop/${supervisor.workshop?.id}`}
-                            >
-                                <KeyAndValue
-                                    keyIdentifier="Nama"
-                                    value={`${supervisor.workshop?.name} `}
-                                />
-                                <ChevronRight className="mt-3" size={18} />
-                            </Link>
-                            <KeyAndValue
-                                keyIdentifier="Nama Pemilik"
-                                value={supervisor.workshop?.owner_name}
-                            />
-                            <KeyAndValue
-                                keyIdentifier="Telepon"
-                                value={supervisor.workshop?.phone}
-                            />
-                            <KeyAndValue
-                                keyIdentifier="Alamat"
-                                value={supervisor.workshop?.address}
-                            />
+                        <div className="flex overflow-x-auto z-10 snap-x snap-mandatory">
+                            <div className="flex gap-4">
+                                {supervisor?.workshops?.map((workshop) => (
+                                    <div
+                                        key={workshop.id}
+                                        className="min-w-full flex-shrink-0 snap-center"
+                                    >
+                                        <div className="flex flex-col gap-1 mb-2">
+                                            <Link
+                                                className="flex items-center gap-1 justify-start text-amber-700 hover:text-amber-800"
+                                                href={`/admin/workshop/${workshop?.id}`}
+                                            >
+                                                <KeyAndValue
+                                                    keyIdentifier="Nama DuDi"
+                                                    value={`${workshop?.name} `}
+                                                />
+                                                <ChevronRight
+                                                    className="mt-3"
+                                                    size={18}
+                                                />
+                                            </Link>
+                                            <KeyAndValue
+                                                dense={true}
+                                                keyIdentifier="Nama Pemilik"
+                                                value={
+                                                    workshop.owner_name ?? "-"
+                                                }
+                                            />
+                                            <KeyAndValue
+                                                dense={true}
+                                                keyIdentifier="No Telepon"
+                                                value={workshop.phone ?? "-"}
+                                            />
+                                            <KeyAndValue
+                                                dense={true}
+                                                keyIdentifier="Alamat"
+                                                className="max-w-sm"
+                                                value={workshop.address ?? "-"}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </Card>
 
@@ -133,8 +153,12 @@ export default function AdminSupervisorShow({
                                 />
                                 <h3 className="text-lg font-semibold">
                                     Siswa yang Didampingi (
-                                    {supervisor?.workshop?.students?.length ??
-                                        0}
+                                    {supervisor?.workshops?.reduce(
+                                        (total, workshop) =>
+                                            total +
+                                            (workshop.students?.length ?? 0),
+                                        0
+                                    )}
                                     )
                                 </h3>
                             </div>
@@ -143,8 +167,12 @@ export default function AdminSupervisorShow({
                             </div>
                         </div>
                         <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-amber-100 to-white rounded-l-md"></div>
-                        {supervisor?.workshop?.students == null ||
-                        supervisor?.workshop?.students?.length == 0 ? (
+                        {supervisor?.workshops?.reduce(
+                            (total, workshop) =>
+                                total +
+                                ((workshop?.students?.length ?? 0) || 0),
+                            0
+                        ) === 0 ? (
                             <div className="flex flex-col z-10">
                                 <span>
                                     Tidak ada siswa PKL yang terdaftar pada DuDi
@@ -154,48 +182,77 @@ export default function AdminSupervisorShow({
                         ) : (
                             <div className="flex overflow-x-auto z-10 snap-x snap-mandatory">
                                 <div className="flex gap-4">
-                                    {supervisor?.workshop.students.map(
-                                        (student) => (
-                                            <div
-                                                key={student.id}
-                                                className="min-w-full flex-shrink-0 snap-center"
-                                            >
-                                                <div className="flex flex-col gap-1 mb-2">
-                                                    <Link
-                                                        className="flex items-center gap-1 justify-start text-amber-700 hover:text-amber-800"
-                                                        href={`/admin/student/${student?.id}`}
-                                                    >
-                                                        <KeyAndValue
-                                                            keyIdentifier="NIS"
-                                                            value={`${student?.nis} `}
-                                                        />
-                                                        <ChevronRight
-                                                            className="mt-3"
-                                                            size={18}
-                                                        />
-                                                    </Link>
-                                                    <KeyAndValue
-                                                        dense={true}
-                                                        keyIdentifier="Nama"
-                                                        value={
-                                                            student.full_name ??
-                                                            "-"
-                                                        }
-                                                    />
-                                                    <KeyAndValue
-                                                        keyIdentifier="Kelas & Jurusan"
-                                                        value={`${
-                                                            student.class ??
-                                                            "Tanpa kelas"
-                                                        } - ${
-                                                            student.major ??
-                                                            "Tanpa jurusan"
-                                                        }`}
-                                                    />
+                                    {supervisor?.workshops?.map((workshop) => (
+                                        <div
+                                            key={workshop.id}
+                                            className="min-w-full flex-shrink-0 snap-center"
+                                        >
+                                            <div className="flex flex-col gap-4 mb-4">
+                                                <div className="flex items-center gap-2">
+                                                    <HiBuildingStorefront className="text-sm text-amber-500" />
+                                                    <h4 className="text-md font-normal">
+                                                        {workshop.name}
+                                                    </h4>
                                                 </div>
+                                                {workshop.students?.length ? (
+                                                    workshop.students.map(
+                                                        (student, index) => (
+                                                            <div
+                                                                key={student.id}
+                                                                className="flex flex-col gap-1"
+                                                            >
+                                                                {index > 0 && (
+                                                                    <Separator className="h-1 bg-amber-200 mb-2" />
+                                                                )}
+                                                                <Link
+                                                                    className="flex items-center gap-1 justify-start text-amber-700 hover:text-amber-800 w-fit"
+                                                                    href={`/admin/student/${student?.id}`}
+                                                                >
+                                                                    <KeyAndValue
+                                                                        dense={
+                                                                            true
+                                                                        }
+                                                                        keyIdentifier="NIS"
+                                                                        value={`${student?.nis} `}
+                                                                    />
+                                                                    <ChevronRight
+                                                                        className="mt-5"
+                                                                        size={
+                                                                            18
+                                                                        }
+                                                                    />
+                                                                </Link>
+                                                                <KeyAndValue
+                                                                    dense={true}
+                                                                    keyIdentifier="Nama"
+                                                                    value={
+                                                                        student.full_name ??
+                                                                        "-"
+                                                                    }
+                                                                />
+                                                                <KeyAndValue
+                                                                    dense={true}
+                                                                    keyIdentifier="Kelas & Jurusan"
+                                                                    value={`${
+                                                                        student.class ??
+                                                                        "Tanpa kelas"
+                                                                    } - ${
+                                                                        student.major ??
+                                                                        "Tanpa jurusan"
+                                                                    }`}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    )
+                                                ) : (
+                                                    <span>
+                                                        Tidak ada siswa yang
+                                                        terdaftar pada DuDi ini
+                                                    </span>
+                                                )}
                                             </div>
-                                        )
-                                    )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}

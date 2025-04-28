@@ -19,13 +19,11 @@ import {
 } from "@/Components/ui/popover";
 import {
     Drawer,
-    DrawerClose,
     DrawerContent,
     DrawerDescription,
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-    DrawerTrigger,
 } from "@/Components/ui/drawer";
 
 type ErrorInputProps = {
@@ -96,7 +94,7 @@ export function SelectSearchInput({
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full py-6 justify-between relative"
+                    className="min-w-full py-6 justify-between relative"
                 >
                     {value ? (
                         <span className="font-normal text-base">
@@ -155,6 +153,103 @@ export function SelectSearchInput({
                                         </span>
                                     </CommandItem>
                                 ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
+}
+
+export function MultiSelectSearchInput({
+    values,
+    options,
+    onChange,
+    placeholder,
+}: {
+    values: string[];
+    options: { label: string; value: string }[];
+    onChange: (values: string[]) => void;
+    placeholder?: string;
+}) {
+    const [open, setOpen] = useState(false);
+
+    const toggleValue = (value: string) => {
+        if (values.includes(value)) {
+            onChange(values.filter((v) => v !== value));
+        } else {
+            onChange([...values, value]);
+        }
+    };
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="min-w-full h-full py-3 justify-between relative"
+                >
+                    {values.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {values.map((val) => {
+                                const label = options.find(
+                                    (option) => option.value === val
+                                )?.label;
+                                return (
+                                    <span
+                                        key={val}
+                                        className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                                    >
+                                        {label}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleValue(val);
+                                            }}
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            <CircleX size={16} />
+                                        </button>
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <span className="font-normal text-slate-500 text-base">
+                            {placeholder}
+                        </span>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="min-w-[400px] p-0" align="start">
+                <Command>
+                    <CommandInput placeholder="Cari pilihan..." />
+                    <CommandList>
+                        <CommandEmpty>Pilihan tidak ada</CommandEmpty>
+                        <CommandGroup>
+                            {options.map((option) => (
+                                <CommandItem
+                                    key={option.value}
+                                    value={option.value}
+                                    onSelect={() => toggleValue(option.value)}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            values.includes(option.value)
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        )}
+                                    />
+                                    <span className="w-full">
+                                        {option.label}
+                                    </span>
+                                </CommandItem>
+                            ))}
                         </CommandGroup>
                     </CommandList>
                 </Command>

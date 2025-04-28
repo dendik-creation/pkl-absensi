@@ -124,7 +124,9 @@ export default function AdminDashboard({
                                 {":"}
                             </span>
                             <span className="text-2xl font-bold leading-none">
-                                {currentMinute}
+                                {currentMinute < 10
+                                    ? `0${currentMinute}`
+                                    : currentMinute}
                             </span>
                         </div>
                     </Card>

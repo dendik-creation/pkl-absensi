@@ -8,7 +8,7 @@ import { PageTitle } from "@/Partials/PageTitle";
 import { ymdToIdDate } from "@/Services/additionalService";
 import { Student } from "@/Types/student";
 import { Link, useForm } from "@inertiajs/react";
-import { IdCard, Pencil, Trash } from "lucide-react";
+import { ChevronRight, IdCard, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { FaUserGear, FaHourglassHalf } from "react-icons/fa6";
 import { FiLoader } from "react-icons/fi";
@@ -102,10 +102,16 @@ export default function AdminStudentShow({
                             keyIdentifier="NIP"
                             value={student.workshop?.supervisor?.nip?.toString()}
                         />
-                        <KeyAndValue
-                            keyIdentifier="Nama"
-                            value={student.workshop?.supervisor?.full_name}
-                        />
+                        <Link
+                            className="flex items-center gap-1 justify-start text-blue-700 hover:text-blue-800 w-fit"
+                            href={`/admin/supervisor/${student?.workshop?.supervisor.id}`}
+                        >
+                            <KeyAndValue
+                                keyIdentifier="Nama"
+                                value={`${student?.workshop?.supervisor.full_name} `}
+                            />
+                            <ChevronRight className="mt-3" size={18} />
+                        </Link>
                         <KeyAndValue
                             keyIdentifier="Email"
                             value={student.workshop?.supervisor?.user?.email}
@@ -134,10 +140,16 @@ export default function AdminStudentShow({
                 </div>
                 <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-blue-100 to-white rounded-l-md"></div>
                 <div className="flex flex-col z-10">
-                    <KeyAndValue
-                        keyIdentifier="Nama"
-                        value={student.workshop?.name}
-                    />
+                    <Link
+                        className="flex items-center gap-1 justify-start text-blue-700 hover:text-blue-800"
+                        href={`/admin/workshop/${student?.workshop?.id}`}
+                    >
+                        <KeyAndValue
+                            keyIdentifier="Nama DuDi"
+                            value={`${student?.workshop?.name} `}
+                        />
+                        <ChevronRight className="mt-3" size={18} />
+                    </Link>
                     <KeyAndValue
                         keyIdentifier="Nama Pemilik"
                         value={student.workshop?.owner_name}

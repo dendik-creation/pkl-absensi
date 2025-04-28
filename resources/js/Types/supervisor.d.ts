@@ -7,5 +7,5 @@ type Supervisor = {
     nip?: string;
     full_name: string;
     user: User;
-    workshop: Workshop;
+    workshops: Workshop[];
 };

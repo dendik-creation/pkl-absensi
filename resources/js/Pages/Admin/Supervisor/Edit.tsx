@@ -1,5 +1,9 @@
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
-import { ErrorInput, SelectSearchInput } from "@/Components/custom/FormElement";
+import {
+    ErrorInput,
+    MultiSelectSearchInput,
+    SelectSearchInput,
+} from "@/Components/custom/FormElement";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { MainLayout } from "@/Layouts/MainLayout";
@@ -29,11 +33,14 @@ export default function AdminSupervisorEdit({
             nip: supervisor.nip || "",
             full_name: supervisor.full_name || "",
             email: supervisor?.user?.email || "",
-            workshop_id: supervisor?.workshop?.id?.toString() || "",
+            workshop_id:
+                supervisor?.workshops?.map((workshop) =>
+                    workshop.id.toString()
+                ) || ([] as string[]),
         });
     const handleErrorInput = () => {
         const fields: { key: keyof typeof data; message: string }[] = [
-            { key: "nip", message: "NIP tidak boleh kosong" },
+            { key: "email", message: "Email tidak boleh kosong" },
             { key: "full_name", message: "Nama tidak boleh kosong" },
         ];
 
@@ -144,17 +151,14 @@ export default function AdminSupervisorEdit({
                 </div>
                 <div className="mb-5">
                     <div className="flex flex-col">
-                        <label className="text-base mb-1">
-                            Tempat DuDi (Opsional)
-                        </label>
-                        <SelectSearchInput
-                            value={data.workshop_id}
+                        <label className="text-base mb-1">Tempat DuDi</label>
+                        <MultiSelectSearchInput
+                            values={data.workshop_id}
                             options={workshops}
-                            onChange={(value) =>
-                                setData("workshop_id", value.toString())
+                            onChange={(values) =>
+                                setData("workshop_id", values)
                             }
                             placeholder="Pilih Tempat DuDi"
-                            removeValue={() => setData("workshop_id", "")}
                         />
                         {errors.workshop_id && (
                             <ErrorInput error={errors.workshop_id} />

@@ -30,7 +30,7 @@ class WorkshopController extends Controller
 
     public function create()
     {
-        $supervisors = Supervisor::all()->map(function ($supervisor) {
+        $supervisors = Supervisor::doesntHave('workshops')->get()->map(function ($supervisor) {
             return [
                 'value' => "" . $supervisor->id . "",
                 'label' => $supervisor->full_name,
@@ -89,7 +89,7 @@ class WorkshopController extends Controller
     public function edit($id)
     {
         $workshop = Workshop::findOrFail($id);
-        $supervisors = Supervisor::all()->map(function ($supervisor) {
+        $supervisors = Supervisor::doesntHave('workshops')->get()->map(function ($supervisor) {
             return [
                 'value' => "" . $supervisor->id . "",
                 'label' => $supervisor->full_name,

@@ -33,14 +33,28 @@ class AuthController extends Controller
             'password' => $request->input('password')
         ];
 
-        $user = User::where('username', $credentials['username'])->first();
+        $user = User::where(function ($query) use ($credentials) {
+            $query->where('username', $credentials['username'])
+                  ->orWhere('email', $credentials['username']);
+        })->first();
+
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return back()->withErrors([
                 'message' => 'Username atau password salah'
             ]);
         }
 
-        if (Auth::attempt($credentials)) {
+        $authCredentials = [
+            'password' => $credentials['password']
+        ];
+
+        if (!is_null($user->username) && $user->username === $credentials['username']) {
+            $authCredentials['username'] = $user->username;
+        } else {
+            $authCredentials['email'] = $user->email;
+        }
+
+        if (Auth::attempt($authCredentials)) {
             return Inertia::location('/');
         }
 
