@@ -22,7 +22,7 @@ class DummyUserSeed extends Seeder
 
         // SPV 1
         User::create([
-            'username' => '1234567890',
+            'username' => '111111',
             'password' => bcrypt('12345'),
             'role' => 'SUPERVISOR',
             'email' => 'supervisor1@gmail.com'
@@ -30,13 +30,13 @@ class DummyUserSeed extends Seeder
 
         Supervisor::create([
             "user_id" => 2,
-            "full_name" => "Supervisor 1",
-            "nip" => "1234567890",
+            "full_name" => "Yusuf Akmal Fauzi",
+            "nip" => "111111",
         ]);
 
         // SPV 2
         User::create([
-            'username' => '111111111',
+            'username' => '222222',
             'password' => bcrypt('12345'),
             'role' => 'SUPERVISOR',
             'email' => 'supervisor2@gmail.com'
@@ -44,8 +44,22 @@ class DummyUserSeed extends Seeder
 
         Supervisor::create([
             "user_id" => 3,
-            "full_name" => "Supervisor 2",
-            "nip" => "111111111",
+            "full_name" => "Suwono",
+            "nip" => "222222",
+        ]);
+
+        // SPV 3
+        User::create([
+            'username' => '333333',
+            'password' => bcrypt('12345'),
+            'role' => 'SUPERVISOR',
+            'email' => 'supervisor3@gmail.com'
+        ]);
+
+        Supervisor::create([
+            "user_id" => 3,
+            "full_name" => "Andre Gunawan",
+            "nip" => "333333",
         ]);
 
         // STD 1
