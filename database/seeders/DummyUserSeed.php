@@ -57,7 +57,7 @@ class DummyUserSeed extends Seeder
         ]);
 
         Supervisor::create([
-            "user_id" => 3,
+            "user_id" => 4,
             "full_name" => "Andre Gunawan",
             "nip" => "333333",
         ]);

@@ -6,10 +6,12 @@ enum AttendanceStatus {
 type Attendance = {
     id: number;
     user_id: number;
-    check_in?: Date | null;
-    check_out?: Date | null;
+    check_in?: string | null;
+    check_out?: string | null;
     reason?: string | null;
     status: AttendanceStatus;
-    latitude?: number | null;
-    longitude?: number | null;
+    latitude_in?: number | null;
+    longitude_in?: number | null;
+    latitude_out?: number | null;
+    longitude_out?: number | null;
 };

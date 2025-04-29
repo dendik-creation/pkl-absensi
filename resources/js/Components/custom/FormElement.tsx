@@ -90,11 +90,10 @@ export function SelectSearchInput({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
+                <div
                     role="combobox"
                     aria-expanded={open}
-                    className="min-w-full py-6 justify-between relative"
+                    className="min-w-full py-3 justify-between relative border border-gray-300 rounded-md px-4 flex items-center cursor-pointer"
                 >
                     {value ? (
                         <span className="font-normal text-base">
@@ -109,20 +108,19 @@ export function SelectSearchInput({
                         </span>
                     )}
                     {value != "" && value != undefined ? (
-                        <Button
-                            variant="link"
-                            type="button"
-                            className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                        <span
+                            className="ml-2 h-4 w-4 shrink-0 opacity-50 cursor-pointer"
                             onClick={(e) => {
+                                e.stopPropagation(); // Prevent closing the popover
                                 removeValue();
                             }}
                         >
-                            <CircleX size={20} className="" />
-                        </Button>
+                            <CircleX size={20} />
+                        </span>
                     ) : (
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     )}
-                </Button>
+                </div>
             </PopoverTrigger>
             <PopoverContent className="min-w-[400px] p-0" align="start">
                 <Command>

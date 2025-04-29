@@ -179,6 +179,7 @@ export default function AdminStudentShow({
                     </div>
                 </div>
                 <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-blue-100 to-white rounded-l-md"></div>
+
                 <div className="flex flex-col z-10">
                     <div className="mb-2">
                         <p className="text-sm font-semibold text-slate-600">
@@ -187,19 +188,25 @@ export default function AdminStudentShow({
                         <div className="flex flex-col">
                             <span className="text-sm">
                                 Masuk (
-                                {latest_activity.attendance?.check_in == null
+                                {latest_activity?.attendance?.check_in == null
                                     ? "-"
                                     : ymdToIdDate(
-                                          latest_activity.attendance?.check_in?.toDateString()
+                                          new Date(
+                                              latest_activity?.attendance?.check_in
+                                          ).toISOString(),
+                                          true
                                       )}
                                 )
                             </span>
                             <span className="text-sm">
                                 Pulang (
-                                {latest_activity.attendance?.check_out == null
+                                {latest_activity?.attendance?.check_out == null
                                     ? "-"
                                     : ymdToIdDate(
-                                          latest_activity.attendance?.check_out?.toDateString()
+                                          new Date(
+                                              latest_activity?.attendance?.check_out
+                                          ).toISOString(),
+                                          true
                                       )}
                                 )
                             </span>
@@ -207,7 +214,7 @@ export default function AdminStudentShow({
                     </div>
                     <KeyAndValue
                         keyIdentifier="Jurnal"
-                        value={latest_activity.journal?.activity}
+                        value={latest_activity?.journal?.activity}
                     />
                 </div>
             </Card>

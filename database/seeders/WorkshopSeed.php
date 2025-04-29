@@ -37,7 +37,7 @@ class WorkshopSeed extends Seeder
 
 
         Student::create([
-            'user_id' => 4,
+            'user_id' => 5,
             'full_name' => "Akbar Firdaus Wicaksono",
             'nis' => '5913',
             'class' => 'XII RPL 3',
@@ -46,7 +46,7 @@ class WorkshopSeed extends Seeder
         ]);
 
         Student::create([
-            'user_id' => 5,
+            'user_id' => 6,
             'full_name' => "Ahmad GedagediGedao",
             'nis' => '5914',
             'class' => 'XII RPL 1',
@@ -54,7 +54,7 @@ class WorkshopSeed extends Seeder
             'workshop_id' => 1,
         ]);
         Student::create([
-            'user_id' => 6,
+            'user_id' => 7,
             'full_name' => "Kurniawan Sukma Wibowo",
             'nis' => '5915',
             'class' => 'XII RPL 1',

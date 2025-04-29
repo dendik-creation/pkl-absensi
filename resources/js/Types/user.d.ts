@@ -2,7 +2,7 @@ import { Student } from "./student";
 import { Supervisor } from "./supervisor";
 
 enum UserRole {
-    Admin = "ADMIN",
+    ADMIN = "ADMIN",
     STUDENT = "STUDENT",
     SUPERVISOR = "SUPERVISOR",
 }
@@ -14,6 +14,4 @@ export type User = {
     role: UserRole;
     student?: Student;
     supervisor?: Supervisor;
-    attendances?: Attendance[];
-    journals?: Journal[];
 };

@@ -4,13 +4,17 @@ import { id } from "date-fns/locale";
 
 export const ymdToIdDate = (
     dateString: string | null | undefined,
-    withTime: boolean = false
+    withTime: boolean = false,
+    timeOnly: boolean = false
 ) => {
     if (!dateString) return null;
     const parsedDate = new Date(dateString as string);
-    const formatString = withTime
-        ? "EEEE, d MMMM yyyy HH:mm"
-        : "EEEE, d MMMM yyyy";
+
+    if (timeOnly) {
+        return format(parsedDate, "HH:mm", { locale: id });
+    }
+
+    const formatString = withTime ? "d MMMM yyyy - HH:mm" : "d MMMM yyyy";
     return format(parsedDate, formatString, { locale: id });
 };
 

@@ -1,4 +1,4 @@
-import { MenuItem } from "@/Types/menu";
+import { MenuItem } from "../Types/menu";
 import { Link } from "@inertiajs/react";
 import { FaHome, FaUser, FaCog } from "react-icons/fa";
 
@@ -9,22 +9,32 @@ export default function NavbarFooter() {
             icon: <FaHome size={24} />,
             label: "Home",
             url: `/${pathame.split("/")[1]}/dashboard`,
+            acceptedRole: ["ADMIN", "STUDENT", "SUPERVISOR"],
         },
         {
             icon: <FaUser size={24} />,
             label: "Profile",
             url: "#",
+            acceptedRole: ["ADMIN", "STUDENT", "SUPERVISOR"],
         },
         {
             icon: <FaCog size={24} />,
             label: "Settings",
             url: "#",
+            acceptedRole: ["ADMIN"],
         },
     ];
     return (
         <div className="fixed max-w-2xl z-[999] mx-auto bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center py-2">
             {menuItems.map((item, index) => {
                 const isActive = window.location.pathname === item.url;
+                if (
+                    !(item.acceptedRole ?? []).includes(
+                        pathame.split("/")[1].toUpperCase()
+                    )
+                ) {
+                    return null;
+                }
                 return (
                     <Link
                         key={index}

@@ -118,7 +118,9 @@ export default function AdminDashboard({
                             )}
                         >
                             <span className="text-2xl font-bold leading-none">
-                                {currentHour}
+                                {currentHour < 10
+                                    ? `0${currentHour}`
+                                    : currentHour}
                             </span>
                             <span className="text-2xl font-bold mx-1 leading-none">
                                 {":"}

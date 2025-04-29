@@ -50,7 +50,6 @@ export default function AdminWorkshopShow({
             <PageTitle
                 title={title as string}
                 description="Detail informasi DuDi"
-                backUrl="/admin/workshop"
             />
 
             <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">

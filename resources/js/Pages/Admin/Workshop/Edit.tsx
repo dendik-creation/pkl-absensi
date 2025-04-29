@@ -92,7 +92,6 @@ export default function AdminWorkshopEdit({
             <PageTitle
                 title={title || "Edit DuDi"}
                 description="Perbarui data DuDi"
-                backUrl={`/admin/workshop/${workshop.id}`}
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">

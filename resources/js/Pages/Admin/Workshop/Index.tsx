@@ -57,7 +57,6 @@ export default function AdminWorkshopIndex({
             <PageTitle
                 title={title as string}
                 description="DuDi yang terdaftar di sistem"
-                backUrl="/admin/dashboard"
             />
 
             <SearchInput
