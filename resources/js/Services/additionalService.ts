@@ -89,3 +89,32 @@ export const handleNipNisInput = (value: string) => {
     }
     return value;
 };
+
+export const distanceConverter = (distance: number) => {
+    if (distance < 1000) {
+        return `${distance} m`;
+    } else {
+        const km = (distance / 1000).toFixed(2).replace(/\.00$/, "");
+        return `${km} km`;
+    }
+};
+
+export const isWithinTimeRange = (
+    startTime: string,
+    endTime: string,
+    currentTime: string
+): boolean => {
+    const parseTime = (time: string, baseDate: Date) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        const date = new Date(baseDate);
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+    };
+
+    const baseDate = new Date(currentTime);
+    const start = parseTime(startTime, baseDate);
+    const end = parseTime(endTime, baseDate);
+    const current = new Date(currentTime);
+
+    return current >= start && current <= end;
+};

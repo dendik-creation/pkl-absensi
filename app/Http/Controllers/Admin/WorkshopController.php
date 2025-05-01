@@ -96,6 +96,11 @@ class WorkshopController extends Controller
             ];
         });
 
+        $supervisors[] = [
+            'value' => "" . $workshop->supervisor_id . "",
+            'label' => $workshop->supervisor->full_name,
+        ];
+
         return Inertia::render('Admin/Workshop/Edit', [
             'title' => "Edit DuDi",
             'workshop' => $workshop,

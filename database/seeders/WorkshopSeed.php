@@ -19,6 +19,8 @@ class WorkshopSeed extends Seeder
             'phone' => '081234567890',
             'supervisor_id' => 1,
             'owner_name' => 'Budi Santoso',
+            'latitude' => 37.7749,
+            'longitude' => -122.4194,
         ]);
         \App\Models\Workshop::create([
             'name' => 'KEDAI ANUGERAH NYAM NYAM',
@@ -26,6 +28,8 @@ class WorkshopSeed extends Seeder
             'phone' => '081234567890',
             'supervisor_id' => 1,
             'owner_name' => 'ALAM',
+            'latitude' => 37.7749,
+            'longitude' => -122.4194,
         ]);
         \App\Models\Workshop::create([
             'name' => 'MEWALIK MEKANIK TUMBUHAN',
@@ -33,6 +37,8 @@ class WorkshopSeed extends Seeder
             'phone' => '081234567890',
             'supervisor_id' => 2,
             'owner_name' => 'MEWALIK FESBUK',
+            'latitude' => 37.7749,
+            'longitude' => -122.4194,
         ]);
 
 

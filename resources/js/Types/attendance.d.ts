@@ -14,4 +14,6 @@ type Attendance = {
     longitude_in?: number | null;
     latitude_out?: number | null;
     longitude_out?: number | null;
+    radius_gap_attendance_in?: number | null;
+    radius_gap_attendance_out?: number | null;
 };
