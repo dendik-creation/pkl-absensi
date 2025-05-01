@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             GlobalSettingSeed::class,
             DummyUserSeed::class,
             WorkshopSeed::class,
-            AttendanceSeeder::class,
+            AttendanceSeed::class,
         ]);
     }
 }

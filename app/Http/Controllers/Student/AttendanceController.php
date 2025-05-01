@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\GlobalSetting;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,48 +18,123 @@ class AttendanceController extends Controller
         return User::where('id', Auth::id())->with('student')->first();
     }
 
+    private function currentAttendanceTime($setting){
+        $now = now();
+        $attendance_in = [
+            'start' => $setting['check_in_start'],
+            'end' => $setting['check_in_end'],
+        ];
+        $attendance_out = [
+            'start' => $setting['check_out_start'],
+            'end' => $setting['check_out_end'],
+        ];
+
+        if ($now->between($attendance_in['start'], $attendance_in['end'])) {
+            return 'MASUK';
+        } elseif ($now->between($attendance_out['start'], $attendance_out['end'])) {
+            return 'PULANG';
+        }
+
+        return 'DI LUAR WAKTU';
+    }
+
     public function index(){
         $user = $this->getAuthUser();
+        $setting = GlobalSetting::first();
+        $attendance_time_name = $this->currentAttendanceTime($setting);
         $attendances = Attendance::where('student_id', $user->student->id)->get();
         return inertia('Student/Attendance/Index', [
             'title' => 'Daftar Absensi',
             'attendances' => $attendances,
+            'attendance_time_name' => $attendance_time_name,
+            'setting' => $setting,
         ]);
     }
 
-    public function create(){
+    public function create(Request $request){
+        $now = now()->format('Y-m-d');
+        $setting = GlobalSetting::first();
+        $attendance_time_name = $this->currentAttendanceTime($setting);
         $user = $this->getAuthUser();
         $student = Student::with('workshop')->where('id', $user->student->id)->first();
-        return inertia('Student/Attendance/Create', [
+
+        $existingAttendance = Attendance::where('student_id', $student->id)
+            ->whereDate('check_in', $now)
+            ->orWhereDate('check_out', $now)
+            ->exists();
+
+        $nowTime = now()->format('H:i:s');
+        if ($existingAttendance || $nowTime < $setting->check_in_start || $nowTime > $setting->check_out_end) {
+            Session::flash('error', 'Diluar waktu absensi, akses ditolak 😁');
+            return back();
+        }
+
+        return inertia('Student/Attendance/Attendance', [
             'title' => 'Absensi',
             'student' => $student,
-            'max_radius' => Attendance::MAX_RADIUS,
+            'max_radius' => $setting->max_attendance_radius,
+            'attendance_time_name' => $attendance_time_name,
+            'utm_source' => $request->utm_source ?? null,
         ]);
     }
 
     public function store(Request $request){
-        $validated = $request->validate([
-            'latitude_in' => 'required|numeric',
-            'longitude_in' => 'required|numeric',
-            'status' => 'required|in:PRESENT,EXCUSED',
-        ]);
+        $attendance_time_name = $this->currentAttendanceTime(GlobalSetting::first());
 
-        if($validated['status'] == 'EXCUSED'){
-            $validated['reason'] = $request->reason;
+        if ($attendance_time_name === 'MASUK') {
+            $validated = $request->validate([
+                'latitude_in' => 'required|numeric',
+                'longitude_in' => 'required|numeric',
+                'status' => 'required|in:PRESENT,EXCUSED',
+            ]);
+
+            if ($validated['status'] == 'EXCUSED') {
+                $validated['reason'] = $request->reason;
+            }
+
+            $user = $this->getAuthUser();
+
+            Attendance::create([
+                'student_id' => $user->student->id,
+                'latitude_in' => $validated['latitude_in'],
+                'longitude_in' => $validated['longitude_in'],
+                'status' => $validated['status'],
+                'check_in' => now(),
+                'reason' => $validated['status'] == 'EXCUSED' ? $validated['reason'] : null,
+            ]);
+
+            Session::flash('success', 'Absensi Masuk Berhasil');
+        } elseif ($attendance_time_name === 'PULANG') {
+            $validated = $request->validate([
+                'latitude_out' => 'required|numeric',
+                'longitude_out' => 'required|numeric',
+            ]);
+
+            $user = $this->getAuthUser();
+
+            $attendance = Attendance::where('student_id', $user->student->id)
+                ->whereDate('check_in', now()->toDateString())
+                ->first();
+
+            if ($attendance) {
+                $attendance->update([
+                    'check_out' => now(),
+                    'latitude_out' => $validated['latitude_out'],
+                    'longitude_out' => $validated['longitude_out'],
+                ]);
+
+                Session::flash('success', 'Absensi Pulang Berhasil');
+            } else {
+                Session::flash('error', 'Tidak ada data absensi masuk untuk hari ini.');
+            }
+        } else {
+            Session::flash('error', 'Waktu absensi tidak valid.');
         }
 
-        $user = $this->getAuthUser();
-
-        Attendance::create([
-            'student_id' => $user->student->id,
-            'latitude_in' => $validated['latitude_in'],
-            'longitude_in' => $validated['longitude_in'],
-            'status' => $validated['status'],
-            'check_in' => now(),
-            'reason' => $validated['status'] == 'EXCUSED' ? $validated['reason'] : null,
-        ]);
-
-        Session::flash('success', 'Absensi Masuk Berhasil');
-        return Inertia::location('/student/dashboard');
+        if($request->has('utm_source') && $request->utm_source == 'student_dashboard'){
+            return Inertia::location('/student/dashboard');
+        }else{
+            return Inertia::location('/student/attendance');
+        }
     }
 }

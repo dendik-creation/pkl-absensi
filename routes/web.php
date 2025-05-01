@@ -69,10 +69,7 @@ Route::middleware('auth')->group(function(){
             Route::get('/', 'index');
             Route::get('/create', 'create');
             Route::get('/{id}', 'show');
-            Route::get('/{id}/edit', 'edit');
             Route::post('/', 'store');
-            Route::put('/{id}', 'update');
-            Route::delete('/{id}', 'destroy');
         });
     });
 });

@@ -49,6 +49,12 @@ export default function StudentDashboard({
             message: flash.success,
         });
     }
+    if (flash.error) {
+        BlastSonner({
+            type: BlastType.ERROR,
+            message: flash.error,
+        });
+    }
     const [currentTime, setCurrentTime] = useState(new Date().toISOString());
 
     useEffect(() => {
@@ -202,7 +208,11 @@ export default function StudentDashboard({
                       setting?.check_in_end,
                       currentTime
                   ) ? (
-                    <Link href={"/student/attendance/create" as string}>
+                    <Link
+                        href={
+                            "/student/attendance/create?utm_source=student_dashboard" as string
+                        }
+                    >
                         <Card className="p-4 relative overflow-hidden shadow-md">
                             <div className="absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-red-100 z-0"></div>
                             <ChevronRight className="absolute z-10 right-3 top-7 text-red-500" />
@@ -261,7 +271,7 @@ export default function StudentDashboard({
                             latest_activity?.attendance?.check_out == null ? (
                                 <Link
                                     href={
-                                        "/student/attendance/create" as string
+                                        "/student/attendance/create?utm_source=student_dashboard" as string
                                     }
                                 >
                                     <Card className="p-4 relative overflow-hidden shadow-md">

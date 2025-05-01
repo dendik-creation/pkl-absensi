@@ -17,12 +17,16 @@ type StudentAttendanceCreateProps = {
     title: string;
     student: Student;
     max_radius: number;
+    attendance_time_name: "MASUK" | "PULANG";
+    utm_source?: string;
 };
 
-export default function StudentAttendanceCreate({
+export default function StudentAttendance({
     title,
     student,
     max_radius,
+    attendance_time_name,
+    utm_source = "",
 }: StudentAttendanceCreateProps) {
     const { data, setData, post, processing, errors, setError, clearErrors } =
         useForm({
@@ -35,11 +39,11 @@ export default function StudentAttendanceCreate({
             latitude_out: 0.0,
             longitude_out: 0.0,
             isInRadius: false as boolean,
+            utm_source: utm_source,
         });
 
     const validateRequiredFields = useCallback((): boolean => {
         const fields: { key: keyof typeof data; message: string }[] = [
-            { key: "check_in", message: "Absensi Masuk tidak boleh kosong" },
             { key: "status", message: "Status tidak boleh kosong" },
         ];
 
@@ -55,7 +59,7 @@ export default function StudentAttendanceCreate({
         });
 
         return hasError;
-    }, [data, setError, clearErrors]);
+    }, [data, setError, clearErrors, attendance_time_name]);
 
     const calculateDistance = (
         lat1: number,
@@ -80,33 +84,40 @@ export default function StudentAttendanceCreate({
     };
 
     const evaluateRadius = useCallback(() => {
-        const { latitude_in, longitude_in } = data;
+        const latitudeKey =
+            attendance_time_name === "MASUK" ? "latitude_in" : "latitude_out";
+        const longitudeKey =
+            attendance_time_name === "MASUK" ? "longitude_in" : "longitude_out";
+
+        const latitude = data[latitudeKey];
+        const longitude = data[longitudeKey];
         const wsLat = student?.workshop?.latitude;
         const wsLng = student?.workshop?.longitude;
 
-        if (!latitude_in || !longitude_in || !wsLat || !wsLng) {
+        if (!latitude || !longitude || !wsLat || !wsLng) {
             setData("isInRadius", false);
-            setError("latitude_in", "radius out");
-            setError("longitude_in", "radius out");
+            setError(latitudeKey, "radius out");
+            setError(longitudeKey, "radius out");
             return;
         }
 
-        const distance = calculateDistance(
-            latitude_in,
-            longitude_in,
-            wsLat,
-            wsLng
-        );
-
+        const distance = calculateDistance(latitude, longitude, wsLat, wsLng);
         setData("isInRadius", distance <= max_radius);
 
         if (distance > max_radius) {
-            setError("latitude_in", "radius out");
-            setError("longitude_in", "radius out");
+            setError(latitudeKey, "radius out");
+            setError(longitudeKey, "radius out");
         }
-    }, [data.latitude_in, data.longitude_in, student, max_radius]);
+    }, [
+        data.latitude_in,
+        data.longitude_in,
+        data.latitude_out,
+        data.longitude_out,
+        student,
+        max_radius,
+        attendance_time_name,
+    ]);
 
-    // Trigger validasi radius hanya ketika status = "PRESENT"
     useEffect(() => {
         if (data.status === "PRESENT") {
             evaluateRadius();
@@ -114,15 +125,33 @@ export default function StudentAttendanceCreate({
             setData("isInRadius", true);
             clearErrors("latitude_in");
             clearErrors("longitude_in");
+            clearErrors("latitude_out");
+            clearErrors("longitude_out");
         }
-    }, [data.status, data.latitude_in, data.longitude_in, evaluateRadius]);
+    }, [
+        data.status,
+        data.latitude_in,
+        data.longitude_in,
+        data.latitude_out,
+        data.longitude_out,
+        evaluateRadius,
+    ]);
 
     const handleLocationChange = useCallback(
         (lat: number, lng: number) => {
-            setData("latitude_in", lat);
-            setData("longitude_in", lng);
+            const latitudeKey =
+                attendance_time_name === "MASUK"
+                    ? "latitude_in"
+                    : "latitude_out";
+            const longitudeKey =
+                attendance_time_name === "MASUK"
+                    ? "longitude_in"
+                    : "longitude_out";
+
+            setData(latitudeKey, lat);
+            setData(longitudeKey, lng);
         },
-        [setData]
+        [setData, attendance_time_name]
     );
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -145,8 +174,19 @@ export default function StudentAttendanceCreate({
 
     return (
         <MustActiveOnAttendance onLocationChange={handleLocationChange}>
-            <MainLayout title={title}>
-                <PageTitle title={title} description="Absensi tepat waktu" />
+            <MainLayout
+                title={`${title} ${
+                    attendance_time_name.charAt(0).toUpperCase() +
+                    attendance_time_name.slice(1).toLowerCase()
+                }`}
+            >
+                <PageTitle
+                    title={`${title} ${
+                        attendance_time_name.charAt(0).toUpperCase() +
+                        attendance_time_name.slice(1).toLowerCase()
+                    }`}
+                    description="Absensi tepat waktu"
+                />
                 <form onSubmit={handleSubmit}>
                     {/* Info Siswa */}
                     <div className="mb-5">
@@ -161,42 +201,49 @@ export default function StudentAttendanceCreate({
                     </div>
 
                     {/* Status Absensi */}
-                    <div className="mb-5">
-                        <label className="text-base mb-1">Status Absensi</label>
-                        <SelectSearchInput
-                            value={data.status}
-                            options={[
-                                { label: "Hadir", value: "PRESENT" },
-                                { label: "Izin", value: "EXCUSED" },
-                            ]}
-                            onChange={(value) =>
-                                setData("status", value.toString())
-                            }
-                            placeholder="Pilih Status Absensi"
-                            removeValue={() => setData("status", "PRESENT")}
-                        />
-                        {errors.status && <ErrorInput error={errors.status} />}
-                    </div>
-
-                    {/* Alasan Izin */}
-                    {data.status === "EXCUSED" && (
+                    {attendance_time_name == "MASUK" && (
                         <div className="mb-5">
                             <label className="text-base mb-1">
-                                Alasan Izin
+                                Status Absensi
                             </label>
-                            <Textarea
-                                className="resize-none"
-                                rows={4}
-                                value={data.reason}
-                                onChange={(e) =>
-                                    setData("reason", e.target.value)
+                            <SelectSearchInput
+                                value={data.status}
+                                options={[
+                                    { label: "Hadir", value: "PRESENT" },
+                                    { label: "Izin", value: "EXCUSED" },
+                                ]}
+                                onChange={(value) =>
+                                    setData("status", value.toString())
                                 }
+                                placeholder="Pilih Status Absensi"
+                                removeValue={() => setData("status", "PRESENT")}
                             />
                             {errors.status && (
                                 <ErrorInput error={errors.status} />
                             )}
                         </div>
                     )}
+
+                    {/* Alasan Izin */}
+                    {data.status === "EXCUSED" &&
+                        attendance_time_name == "MASUK" && (
+                            <div className="mb-5">
+                                <label className="text-base mb-1">
+                                    Alasan Izin
+                                </label>
+                                <Textarea
+                                    className="resize-none"
+                                    rows={4}
+                                    value={data.reason}
+                                    onChange={(e) =>
+                                        setData("reason", e.target.value)
+                                    }
+                                />
+                                {errors.status && (
+                                    <ErrorInput error={errors.status} />
+                                )}
+                            </div>
+                        )}
 
                     {/* Lokasi */}
                     <div className="mb-5">
@@ -205,12 +252,20 @@ export default function StudentAttendanceCreate({
                         </label>
                         <MapPicker
                             readonly={true}
-                            latitude={data.latitude_in ?? undefined}
-                            longitude={data.longitude_in ?? undefined}
+                            latitude={
+                                attendance_time_name === "MASUK"
+                                    ? data.latitude_in ?? undefined
+                                    : data.latitude_out ?? undefined
+                            }
+                            longitude={
+                                attendance_time_name === "MASUK"
+                                    ? data.longitude_in ?? undefined
+                                    : data.longitude_out ?? undefined
+                            }
                         />
-                        {errors.latitude_in && errors.longitude_in && (
+                        {!data.isInRadius && (
                             <ErrorInput
-                                error={"Kamu harus disekitar tempat DuDi"}
+                                error={"Kamu terlalu jauh dari tempat DuDi"}
                             />
                         )}
                     </div>
