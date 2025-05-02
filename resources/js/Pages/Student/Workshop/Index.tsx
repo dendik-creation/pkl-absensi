@@ -1,16 +1,10 @@
-import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
-import { DrawerConfirmAction } from "@/Components/custom/FormElement";
 import KeyAndValue from "@/Components/custom/KeyAndValue";
-import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { Workshop } from "@/Types/workshop";
-import { Link, useForm } from "@inertiajs/react";
-import { ChevronRight, MapPinned, Pencil, Trash } from "lucide-react";
-import { useState } from "react";
+import { MapPinned } from "lucide-react";
 import { FaUserGear } from "react-icons/fa6";
-import { FiLoader } from "react-icons/fi";
 import { HiBuildingStorefront } from "react-icons/hi2";
 import { PiStudentFill } from "react-icons/pi";
 import MapPicker from "@/Components/custom/MapPicker";

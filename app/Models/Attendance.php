@@ -16,7 +16,7 @@ class Attendance extends Model
     const EXCUSED = 'EXCUSED';
     protected $guarded = ['id'];
 
-    public function user(){
-        return $this->belongsTo(User::class);
+    public function student(){
+        return $this->belongsTo(Student::class);
     }
 }
