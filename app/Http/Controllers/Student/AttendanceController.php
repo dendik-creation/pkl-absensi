@@ -140,4 +140,12 @@ class AttendanceController extends Controller
             return Inertia::location('/student/attendance');
         }
     }
+
+    public function show($id){
+        $attendance = Attendance::with('student')->findOrFail($id);
+        return inertia('Student/Attendance/Show', [
+            'title' => 'Detail Absensi',
+            'attendance' => $attendance,
+        ]);
+    }
 }
