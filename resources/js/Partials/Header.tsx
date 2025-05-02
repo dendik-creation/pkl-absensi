@@ -1,7 +1,7 @@
 import { Button } from "@/Components/ui/button";
 import React, { useState } from "react";
 import { FiLoader, FiLogOut } from "react-icons/fi";
-import { useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { DrawerConfirmAction } from "@/Components/custom/FormElement";
 
 export default function Header({ title }: { title?: string }) {
@@ -15,11 +15,13 @@ export default function Header({ title }: { title?: string }) {
 
     return (
         <header className="bg-white px-5 z-[999] flex items-center justify-between border-b">
-            <img
-                src="/assets/img/smk-bisa-hebat.png"
-                alt="Header Image"
-                className="h-16"
-            />
+            <Link href="/" className="flex items-center gap-2">
+                <img
+                    src="/assets/img/smk-bisa-hebat.png"
+                    alt="Header Image"
+                    className="h-16"
+                />
+            </Link>
             <h4 className="font-semibold">{title}</h4>
             <div>
                 <Button

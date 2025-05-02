@@ -14,8 +14,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            GlobalSettingSeed::class,
             DummyUserSeed::class,
             WorkshopSeed::class,
+            AttendanceSeed::class,
         ]);
     }
 }

@@ -1,4 +1,4 @@
-import { TriangleAlert, Search, CircleX } from "lucide-react";
+import { TriangleAlert, Search, CircleX, CalendarIcon } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "../ui/input";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -19,14 +19,15 @@ import {
 } from "@/Components/ui/popover";
 import {
     Drawer,
-    DrawerClose,
     DrawerContent,
     DrawerDescription,
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-    DrawerTrigger,
 } from "@/Components/ui/drawer";
+import { Calendar } from "@/Components/ui/calendar";
+import { ymdToIdDate } from "@/Services/additionalService";
+import RichTextEditor from "@mantine/rte";
 
 type ErrorInputProps = {
     error: string | null;
@@ -92,11 +93,10 @@ export function SelectSearchInput({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
+                <div
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full py-6 justify-between relative"
+                    className="min-w-full py-3 justify-between relative border border-gray-300 rounded-md px-4 flex items-center cursor-pointer"
                 >
                     {value ? (
                         <span className="font-normal text-base">
@@ -111,20 +111,19 @@ export function SelectSearchInput({
                         </span>
                     )}
                     {value != "" && value != undefined ? (
-                        <Button
-                            variant="link"
-                            type="button"
-                            className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                        <span
+                            className="ml-2 h-4 w-4 shrink-0 opacity-50 cursor-pointer"
                             onClick={(e) => {
+                                e.stopPropagation(); // Prevent closing the popover
                                 removeValue();
                             }}
                         >
-                            <CircleX size={20} className="" />
-                        </Button>
+                            <CircleX size={20} />
+                        </span>
                     ) : (
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     )}
-                </Button>
+                </div>
             </PopoverTrigger>
             <PopoverContent className="min-w-[400px] p-0" align="start">
                 <Command>
@@ -160,6 +159,217 @@ export function SelectSearchInput({
                 </Command>
             </PopoverContent>
         </Popover>
+    );
+}
+
+export function MultiSelectSearchInput({
+    values,
+    options,
+    onChange,
+    placeholder,
+}: {
+    values: string[];
+    options: { label: string; value: string }[];
+    onChange: (values: string[]) => void;
+    placeholder?: string;
+}) {
+    const [open, setOpen] = useState(false);
+
+    const toggleValue = (value: string) => {
+        if (values.includes(value)) {
+            onChange(values.filter((v) => v !== value));
+        } else {
+            onChange([...values, value]);
+        }
+    };
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="min-w-full h-full py-3 justify-between relative"
+                >
+                    {values.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {values.map((val) => {
+                                const label = options.find(
+                                    (option) => option.value === val
+                                )?.label;
+                                return (
+                                    <span
+                                        key={val}
+                                        className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                                    >
+                                        {label}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleValue(val);
+                                            }}
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            <CircleX size={16} />
+                                        </button>
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <span className="font-normal text-slate-500 text-base">
+                            {placeholder}
+                        </span>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="min-w-[400px] p-0" align="start">
+                <Command>
+                    <CommandInput placeholder="Cari pilihan..." />
+                    <CommandList>
+                        <CommandEmpty>Pilihan tidak ada</CommandEmpty>
+                        <CommandGroup>
+                            {options.map((option) => (
+                                <CommandItem
+                                    key={option.value}
+                                    value={option.value}
+                                    onSelect={() => toggleValue(option.value)}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            values.includes(option.value)
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        )}
+                                    />
+                                    <span className="w-full">
+                                        {option.label}
+                                    </span>
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
+}
+
+export const DatePickerInput = ({
+    value,
+    onChange,
+    placeholder = "Pilih tanggal",
+    mode = "single",
+    className,
+}: {
+    value: string | undefined;
+    onChange: (date: string | undefined) => void;
+    placeholder?: string;
+    mode: "single" | "multiple" | "range";
+    className?: string;
+}) => {
+    const formatDate = (date: string | undefined) => {
+        if (!date) return placeholder;
+
+        const formattedDate = new Date(date)
+            .toLocaleDateString("id-ID", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            })
+            .split("/")
+            .reverse()
+            .join("-");
+
+        return ymdToIdDate(formattedDate);
+    };
+
+    const handleSelect = (
+        date: Date | Date[] | { from: Date; to: Date } | undefined
+    ) => {
+        if (!date) {
+            onChange(undefined);
+            return;
+        }
+
+        const formatSingleDate = (d: Date) =>
+            d
+                .toLocaleDateString("id-ID", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                })
+                .split("/")
+                .reverse()
+                .join("-");
+
+        if (mode === "single") {
+            onChange(formatSingleDate(date as Date));
+        } else if (mode === "multiple" && Array.isArray(date)) {
+            onChange(date.map(formatSingleDate).join(","));
+        } else if (mode === "range") {
+            const range = date as { from: Date; to: Date };
+            onChange(
+                `${formatSingleDate(range.from)} - ${formatSingleDate(
+                    range.to
+                )}`
+            );
+        }
+    };
+
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    className={cn(
+                        "w-full pl-3 h-12 text-left font-normal",
+                        !value && "text-muted-foreground",
+                        className
+                    )}
+                >
+                    <span>{formatDate(value)}</span>
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+                <Calendar
+                    mode={mode}
+                    selected={value ? new Date(value) : undefined}
+                    onSelect={handleSelect}
+                    initialFocus
+                />
+            </PopoverContent>
+        </Popover>
+    );
+};
+
+export default function RichTextEditorInput({
+    content,
+    onChange,
+}: {
+    content: string;
+    onChange: (value: string) => void;
+}) {
+    return (
+        <RichTextEditor
+            value={content}
+            onChange={onChange}
+            sticky={true}
+            className="rounded-md border h-[400px] overflow-auto"
+            controls={[
+                ["bold", "italic", "underline"],
+                ["unorderedList", "orderedList"],
+                ["h1", "h2", "h3"],
+                ["sup", "sub"],
+                ["link", "image"],
+                ["clean"],
+            ]}
+        />
     );
 }
 

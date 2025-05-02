@@ -14,19 +14,31 @@ interface BlastSonnerProps {
 export default function BlastSonner({ type, message }: BlastSonnerProps) {
     switch (type) {
         case BlastType.SUCCESS:
-            return toast.success(message, {
+            return toast.success("Sukses", {
                 richColors: true,
+                description: message,
                 icon: "✅",
+                style: {
+                    fontFamily: "Space Grotesk",
+                },
             });
         case BlastType.ERROR:
-            return toast.error(message, {
+            return toast.error("Gagal", {
                 richColors: true,
+                description: message,
                 icon: "❌",
+                style: {
+                    fontFamily: "Space Grotesk",
+                },
             });
         case BlastType.WARNING:
-            return toast.warning(message, {
+            return toast.warning("Peringatan", {
+                description: message,
                 richColors: true,
                 icon: "⚠️",
+                style: {
+                    fontFamily: "Space Grotesk",
+                },
             });
         default:
             return toast(message);

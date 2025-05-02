@@ -10,6 +10,11 @@ use App\Http\Controllers\Admin\StudentController as AdminStudent;
 use App\Http\Controllers\Admin\WorkshopController as AdminWorkshop;
 use App\Http\Controllers\Admin\SupervisorController as AdminSupervisor;
 
+use App\Http\Controllers\Student\DashboardController as StudentDashboard;
+use App\Http\Controllers\Student\AttendanceController as StudentAttendance;
+use App\Http\Controllers\Student\JournalController as StudentJournal;
+use App\Http\Controllers\Student\WorkshopController as StudentWorkshop;
+
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
 Route::prefix('auth')->group(function () {
@@ -55,6 +60,32 @@ Route::middleware('auth')->group(function(){
             Route::post('/', 'store');
             Route::put('/{id}', 'update');
             Route::delete('/{id}', 'destroy');
+        });
+    });
+
+    // Student Access
+    Route::prefix('student')->group(function () {
+        Route::get('/dashboard', [StudentDashboard::class, 'index']);
+
+        Route::prefix('/attendance')->controller(StudentAttendance::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/create', 'create');
+            Route::get('/{id}', 'show');
+            Route::post('/', 'store');
+        });
+
+        Route::prefix('/journal')->controller(StudentJournal::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/create', 'create');
+            Route::get('/{id}', 'show');
+            Route::get('/{id}/edit', 'edit');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+        });
+
+        Route::prefix('/workshop')->controller(StudentWorkshop::class)->group(function () {
+            Route::get('/', 'index');
         });
     });
 });

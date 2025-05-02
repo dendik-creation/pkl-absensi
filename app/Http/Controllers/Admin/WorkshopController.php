@@ -17,27 +17,28 @@ class WorkshopController extends Controller
 
         $workshops = Workshop::with('supervisor')
             ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('address', 'like', "%{$search}%");
+                $query->where('name', 'like', "%{$search}%")->orWhere('address', 'like', "%{$search}%");
             })
             ->paginate(20);
 
         return Inertia::render('Admin/Workshop/Index', [
-            'title' => "Data DuDi",
+            'title' => 'Data DuDi',
             'workshops' => $workshops->items(),
         ]);
     }
 
     public function create()
     {
-        $supervisors = Supervisor::all()->map(function ($supervisor) {
-            return [
-                'value' => "" . $supervisor->id . "",
-                'label' => $supervisor->full_name,
-            ];
-        });
+        $supervisors = Supervisor::doesntHave('workshops')
+            ->get()
+            ->map(function ($supervisor) {
+                return [
+                    'value' => '' . $supervisor->id . '',
+                    'label' => $supervisor->full_name,
+                ];
+            });
         return Inertia::render('Admin/Workshop/Create', [
-            'title' => "Tambah DuDi",
+            'title' => 'Tambah DuDi',
             'supervisors' => $supervisors,
         ]);
     }
@@ -53,12 +54,12 @@ class WorkshopController extends Controller
             'longitude' => 'required',
         ]);
 
-        if($request->supervisor_id != "" && $request->supervisor_id != null){
+        if ($request->supervisor_id != '' && $request->supervisor_id != null) {
             $validated['supervisor_id'] = $request->supervisor_id;
             $supervisorHasWorkshop = Workshop::where('supervisor_id', $request->supervisor_id)->first();
-            if($supervisorHasWorkshop){
+            if ($supervisorHasWorkshop) {
                 return back()->withErrors([
-                    'message' => 'Pembimbing sudah ditugaskan di Dudi lain'
+                    'message' => 'Pembimbing sudah ditugaskan di Dudi lain',
                 ]);
             }
         }
@@ -77,11 +78,12 @@ class WorkshopController extends Controller
         return Inertia::location('/admin/workshop');
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $workshop = Workshop::with('supervisor', 'students')->findOrFail($id);
 
         return Inertia::render('Admin/Workshop/Show', [
-            'title' => "Informasi DuDi",
+            'title' => 'Informasi DuDi',
             'workshop' => $workshop,
         ]);
     }
@@ -90,14 +92,14 @@ class WorkshopController extends Controller
     {
         $workshop = Workshop::findOrFail($id);
         $supervisors = Supervisor::all()->map(function ($supervisor) {
-            return [
-                'value' => "" . $supervisor->id . "",
-                'label' => $supervisor->full_name,
-            ];
-        });
+                return [
+                    'value' => '' . $supervisor->id . '',
+                    'label' => $supervisor->full_name,
+                ];
+            });
 
         return Inertia::render('Admin/Workshop/Edit', [
-            'title' => "Edit DuDi",
+            'title' => 'Edit DuDi',
             'workshop' => $workshop,
             'supervisors' => $supervisors,
         ]);
@@ -114,14 +116,12 @@ class WorkshopController extends Controller
             'longitude' => 'required',
         ]);
 
-        if($request->supervisor_id != "" && $request->supervisor_id != null){
+        if ($request->supervisor_id != '' && $request->supervisor_id != null) {
             $validated['supervisor_id'] = $request->supervisor_id;
-            $supervisorHasWorkshop = Workshop::where('supervisor_id', $request->supervisor_id)
-            ->where('id', '!=', $id)
-            ->first();
-            if($supervisorHasWorkshop){
+            $supervisorHasWorkshop = Workshop::where('supervisor_id', $request->supervisor_id)->where('id', '!=', $id)->first();
+            if ($supervisorHasWorkshop && $supervisorHasWorkshop->supervisor_id != $request->supervisor_id) {
                 return back()->withErrors([
-                    'message' => 'Pembimbing sudah ditugaskan di Dudi lain'
+                    'message' => 'Pembimbing sudah ditugaskan di Dudi lain',
                 ]);
             }
         }

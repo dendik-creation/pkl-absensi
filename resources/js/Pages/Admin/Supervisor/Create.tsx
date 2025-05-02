@@ -1,5 +1,9 @@
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
-import { ErrorInput, SelectSearchInput } from "@/Components/custom/FormElement";
+import {
+    ErrorInput,
+    MultiSelectSearchInput,
+    SelectSearchInput,
+} from "@/Components/custom/FormElement";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { MainLayout } from "@/Layouts/MainLayout";
@@ -26,12 +30,12 @@ export default function AdminSupervisorCreate({
             nip: "",
             full_name: "",
             email: "",
-            workshop_id: "",
+            workshop_id: [] as string[],
         });
     const handleErrorInput = () => {
         const fields: { key: keyof typeof data; message: string }[] = [
-            { key: "nip", message: "NIP tidak boleh kosong" },
             { key: "full_name", message: "Nama tidak boleh kosong" },
+            { key: "email", message: "Email tidak boleh kosong" },
         ];
 
         let hasError = false;
@@ -77,12 +81,13 @@ export default function AdminSupervisorCreate({
             <PageTitle
                 title={title as string}
                 description="Menambahkan pembimbing baru ke sistem"
-                backUrl="/admin/supervisor"
             />
             <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                     <div className="flex flex-col">
-                        <label className="text-base mb-1">NIP</label>
+                        <label className="text-base mb-1">
+                            NIP (Kosongkan jika tidak ada)
+                        </label>
                         <Input
                             type="text"
                             inputMode="numeric"
@@ -124,9 +129,7 @@ export default function AdminSupervisorCreate({
                 </div>
                 <div className="mb-5">
                     <div className="flex flex-col">
-                        <label className="text-base mb-1">
-                            Email (Opsional)
-                        </label>
+                        <label className="text-base mb-1">Email</label>
                         <Input
                             type="email"
                             placeholder="Masukkan Email"
@@ -142,16 +145,15 @@ export default function AdminSupervisorCreate({
                 <div className="mb-5">
                     <div className="flex flex-col">
                         <label className="text-base mb-1">
-                            Tempat DuDi (Opsional)
+                            Tempat DuDi (Bisa nanti)
                         </label>
-                        <SelectSearchInput
-                            value={data.workshop_id}
+                        <MultiSelectSearchInput
+                            values={data.workshop_id}
                             options={workshops}
-                            onChange={(value) =>
-                                setData("workshop_id", value.toString())
+                            onChange={(values) =>
+                                setData("workshop_id", values)
                             }
                             placeholder="Pilih Tempat DuDi"
-                            removeValue={() => setData("workshop_id", "")}
                         />
                         {errors.workshop_id && (
                             <ErrorInput error={errors.workshop_id} />

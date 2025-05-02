@@ -58,7 +58,6 @@ export default function AdminSupervisorIndex({
             <PageTitle
                 title={title as string}
                 description="Data pembinbing yang bertugas di DuDi"
-                backUrl="/admin/dashboard"
             />
 
             <SearchInput
@@ -88,7 +87,11 @@ export default function AdminSupervisorIndex({
                         >
                             <Card className="shadow-md p-4 mb-3 flex items-center overflow-hidden justify-between relative">
                                 <div className="z-10">
-                                    <h3 className="text-xl font-semibold">
+                                    <h3
+                                        className={`text-xl font-semibold ${
+                                            supervisor?.nip ?? "italic"
+                                        }`}
+                                    >
                                         {supervisor.nip ?? "NIP tidak ada"}
                                     </h3>
                                     <p className="text-base">
@@ -99,28 +102,28 @@ export default function AdminSupervisorIndex({
                                                 "Tanpa email"}
                                         </span>
                                     </p>
-                                    {supervisor?.workshop != null ? (
+                                    {supervisor?.workshops?.length > 0 ? (
                                         <div className="">
                                             <p className="text-base">
                                                 Bertugas di{" "}
-                                                <span className="font-medium text-slate-700 hover:text-blue-500">
-                                                    <Link
-                                                        href={`/admin/workshop/${supervisor?.workshop?.id}`}
-                                                    >
-                                                        {
-                                                            supervisor?.workshop
-                                                                ?.name
-                                                        }
-                                                    </Link>
+                                                <span className="font-medium text-slate-700">
+                                                    {
+                                                        supervisor?.workshops
+                                                            ?.length
+                                                    }{" "}
+                                                    DuDi
                                                 </span>
                                             </p>
                                             <p className="text-base">
                                                 Mendampingi{" "}
                                                 <span className="font-medium">
-                                                    {
-                                                        supervisor?.workshop
-                                                            ?.students?.length
-                                                    }{" "}
+                                                    {supervisor?.workshops?.reduce(
+                                                        (total, workshop) =>
+                                                            total +
+                                                            (workshop?.students
+                                                                ?.length || 0),
+                                                        0
+                                                    )}{" "}
                                                 </span>
                                                 Siswa
                                             </p>

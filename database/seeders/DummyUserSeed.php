@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -21,26 +20,68 @@ class DummyUserSeed extends Seeder
             'role' => 'ADMIN',
         ]);
 
-        // SPV
+        // SPV 1
         User::create([
-            'username' => '1234567890',
+            'username' => '111111',
             'password' => bcrypt('12345'),
             'role' => 'SUPERVISOR',
-            'email' => 'supervisor@gmail.com'
+            'email' => 'supervisor1@gmail.com'
         ]);
 
         Supervisor::create([
             "user_id" => 2,
-            "full_name" => "Supervisor 1",
-            "nip" => "1234567890",
+            "full_name" => "Yusuf Akmal Fauzi",
+            "nip" => "111111",
         ]);
 
-        // STD
+        // SPV 2
         User::create([
-            'username' => '1234',
+            'username' => '222222',
+            'password' => bcrypt('12345'),
+            'role' => 'SUPERVISOR',
+            'email' => 'supervisor2@gmail.com'
+        ]);
+
+        Supervisor::create([
+            "user_id" => 3,
+            "full_name" => "Suwono",
+            "nip" => "222222",
+        ]);
+
+        // SPV 3
+        User::create([
+            'username' => '333333',
+            'password' => bcrypt('12345'),
+            'role' => 'SUPERVISOR',
+            'email' => 'supervisor3@gmail.com'
+        ]);
+
+        Supervisor::create([
+            "user_id" => 4,
+            "full_name" => "Andre Gunawan",
+            "nip" => "333333",
+        ]);
+
+        // STD 1
+        User::create([
+            'username' => '5913',
             'password' => bcrypt('12345'),
             'role' => 'STUDENT',
-            'email' => 'student@gmail.com'
+            'email' => 'student1@gmail.com'
+        ]);
+        // STD 2
+        User::create([
+            'username' => '5914',
+            'password' => bcrypt('12345'),
+            'role' => 'STUDENT',
+            'email' => 'student2@gmail.com'
+        ]);
+        // STD 3
+        User::create([
+            'username' => '5915',
+            'password' => bcrypt('12345'),
+            'role' => 'STUDENT',
+            'email' => 'student3@gmail.com'
         ]);
     }
 }

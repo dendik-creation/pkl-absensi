@@ -1,6 +1,9 @@
+import { Student } from "./student";
+
 type Journal = {
     id: number;
-    user_id: number;
+    student_id: number;
     date: Date;
     activity: string;
+    student?: Student;
 };

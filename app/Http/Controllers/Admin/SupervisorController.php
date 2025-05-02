@@ -7,6 +7,7 @@ use App\Models\Supervisor;
 use App\Models\User;
 use App\Models\Workshop;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
@@ -16,7 +17,7 @@ class SupervisorController extends Controller
     {
         $search = $request->input('search');
 
-        $supervisors = Supervisor::with('workshop.students', 'user')
+        $supervisors = Supervisor::with('workshops.students', 'user')
             ->when($search, function ($query, $search) {
                 $query->where('full_name', 'like', "%{$search}%")->orWhere('nip', 'like', "%{$search}%");
             })
@@ -30,7 +31,7 @@ class SupervisorController extends Controller
 
     public function show($id)
     {
-        $supervisor = Supervisor::with('user', 'workshop.students')->findOrFail($id);
+        $supervisor = Supervisor::with('user', 'workshops.students')->findOrFail($id);
 
         return Inertia::render('Admin/Supervisor/Show', [
             'title' => 'Informasi Pembimbing',
@@ -40,7 +41,7 @@ class SupervisorController extends Controller
 
     public function create()
     {
-        $workshops = Workshop::all()->map(function ($workshop) {
+        $workshops = Workshop::where('supervisor_id', null)->get()->map(function ($workshop) {
             return [
                 'value' => '' . $workshop->id . '',
                 'label' => $workshop->name,
@@ -55,32 +56,41 @@ class SupervisorController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nip' => 'required',
+            'email' => 'required|email',
             'full_name' => 'required',
         ]);
 
-        if ($request->workshop_id != '' && $request->workshop_id != null) {
-            $workshopHasSupervisor = Workshop::where('id', $request->workshop_id)->first();
-            if ($workshopHasSupervisor->supervisor_id != null) {
+        $conflictingWorkshops = collect();
+        if ($request->workshop_id && is_array($request->workshop_id)) {
+            $conflictingWorkshops = Workshop::whereIn('id', $request->workshop_id)
+                ->whereNotNull('supervisor_id')
+                ->get();
+
+            if ($conflictingWorkshops->isNotEmpty()) {
                 return back()->withErrors([
-                    'message' => 'Pembimbing lain sudah ditugaskan pada DuDi ini',
+                    'message' => 'Beberapa DuDi sudah memiliki pembimbing yang ditugaskan',
                 ]);
             }
         }
 
-        $user = User::create([
-            'username' => $validated['nip'],
-            'email' => $request->email ?: null,
-            'password' => bcrypt(config('app.default_password')),
-            'role' => User::SUPERVISOR_ROLE,
-        ]);
+        DB::transaction(function () use ($request, $validated) {
+            $user = User::create([
+                'username' => $request->nip ?: null,
+                'email' => $validated['email'],
+                'password' => bcrypt(config('app.default_password')),
+                'role' => User::SUPERVISOR_ROLE,
+            ]);
 
-        Supervisor::create([
-            'user_id' => $user->id,
-            'full_name' => $validated['full_name'],
-            'nip' => $validated['nip'],
-            'workshop_id' => $request->workshop_id ?: null,
-        ]);
+            $supervisor = Supervisor::create([
+                'user_id' => $user->id,
+                'full_name' => $validated['full_name'],
+                'nip' => $request->nip ?: null,
+            ]);
+
+            if ($request->workshop_id && is_array($request->workshop_id)) {
+                Workshop::whereIn('id', $request->workshop_id)->update(['supervisor_id' => $supervisor->id]);
+            }
+        });
 
         Session::flash('success', 'Pembimbing baru berhasil ditambahkan');
         return Inertia::location('/admin/supervisor');
@@ -88,13 +98,22 @@ class SupervisorController extends Controller
 
     public function edit($id)
     {
-        $supervisor = Supervisor::with('user', 'workshop')->findOrFail($id);
-        $workshops = Workshop::all()->map(function ($workshop) {
+        $supervisor = Supervisor::with('user', 'workshops')->findOrFail($id);
+        $workshops = Workshop::where('supervisor_id', null)->get()->map(function ($workshop) {
             return [
                 'value' => '' . $workshop->id . '',
                 'label' => $workshop->name,
             ];
         });
+
+        if($supervisor->workshops != null && count($supervisor->workshops) > 0) {
+            foreach ($supervisor->workshops as $workshop) {
+                $workshops->push([
+                    'value' => '' . $workshop->id . '',
+                    'label' => $workshop->name,
+                ]);
+            }
+        }
 
         return Inertia::render('Admin/Supervisor/Edit', [
             'title' => 'Edit Pembimbing',
@@ -106,33 +125,44 @@ class SupervisorController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nip' => 'required',
+            'email' => 'required|email',
             'full_name' => 'required',
         ]);
 
-        if ($request->workshop_id != '' && $request->workshop_id != null) {
-            $workshopHasSupervisor = Workshop::where('id', $request->workshop_id)->first();
-            if ($workshopHasSupervisor->supervisor_id != null && $workshopHasSupervisor->supervisor_id != $id) {
-                return back()->withErrors([
-                    'message' => 'Pembimbing lain sudah ditugaskan pada DuDi ini',
-                ]);
-            } elseif ($workshopHasSupervisor->supervisor_id != $id) {
-                $workshopHasSupervisor->supervisor_id = $id;
-                $workshopHasSupervisor->save();
-            }
-        }
-
         $supervisor = Supervisor::findOrFail($id);
 
-        if ($supervisor->nip !== $validated['nip']) {
+        if ($request->workshop_id && is_array($request->workshop_id)) {
+            $conflictingWorkshops = Workshop::whereIn('id', $request->workshop_id)
+            ->whereNotNull('supervisor_id')
+            ->where('supervisor_id', '!=', $id)
+            ->exists();
+
+            if ($conflictingWorkshops) {
+            return back()->withErrors([
+                'message' => 'Beberapa DuDi sudah memiliki pembimbing yang ditugaskan',
+            ]);
+            }
+
+            Workshop::whereIn('id', $request->workshop_id)
+            ->update(['supervisor_id' => $id]);
+
+            Workshop::where('supervisor_id', $id)
+            ->whereNotIn('id', $request->workshop_id)
+            ->update(['supervisor_id' => null]);
+        } else {
+            Workshop::where('supervisor_id', $id)
+            ->update(['supervisor_id' => null]);
+        }
+
+        if ($supervisor->nip !== $request->nip) {
             $supervisor->user->update([
-                'username' => $validated['nip'],
+                'username' => $request->nip ?: null,
             ]);
         }
 
         $supervisor->update([
             'full_name' => $validated['full_name'],
-            'nip' => $validated['nip'],
+            'nip' => $request->nip ?: null,
         ]);
 
         Session::flash('success', 'Pembimbing berhasil diperbarui');

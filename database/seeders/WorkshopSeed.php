@@ -19,16 +19,53 @@ class WorkshopSeed extends Seeder
             'phone' => '081234567890',
             'supervisor_id' => 1,
             'owner_name' => 'Budi Santoso',
+            'latitude' => -6.826408,
+            'longitude' => 110.876416,
+        ]);
+        \App\Models\Workshop::create([
+            'name' => 'KEDAI ANUGERAH NYAM NYAM',
+            'address' => 'Jl. Nyam Nyam No. 2, Anugerah, Kec. Anugerah, Kota Anugerah',
+            'phone' => '081234567890',
+            'supervisor_id' => 1,
+            'owner_name' => 'ALAM',
+            'latitude' => -6.826408,
+            'longitude' => 110.876416,
+        ]);
+        \App\Models\Workshop::create([
+            'name' => 'MEWALIK MEKANIK TUMBUHAN',
+            'address' => 'Jl. Tumbuhan No. 3, Mekanik, Kec. Mekanik, Kota Mekanik',
+            'phone' => '081234567890',
+            'supervisor_id' => 2,
+            'owner_name' => 'MEWALIK FESBUK',
+            'latitude' => -6.826408,
+            'longitude' => 110.876416,
         ]);
 
 
         Student::create([
-            'user_id' => 3,
+            'user_id' => 5,
             'full_name' => "Akbar Firdaus Wicaksono",
-            'nis' => '5912',
+            'nis' => '5913',
+            'class' => 'XII RPL 3',
+            'major' => 'RPL',
+            'workshop_id' => 1,
+        ]);
+
+        Student::create([
+            'user_id' => 6,
+            'full_name' => "Ahmad GedagediGedao",
+            'nis' => '5914',
             'class' => 'XII RPL 1',
             'major' => 'RPL',
             'workshop_id' => 1,
+        ]);
+        Student::create([
+            'user_id' => 7,
+            'full_name' => "Kurniawan Sukma Wibowo",
+            'nis' => '5915',
+            'class' => 'XII RPL 1',
+            'major' => 'RPL',
+            'workshop_id' => 2,
         ]);
     }
 }

@@ -7,13 +7,14 @@ import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { Workshop } from "@/Types/workshop";
 import { Link, useForm } from "@inertiajs/react";
-import { MapPinned, Pencil, Trash } from "lucide-react";
+import { ChevronRight, MapPinned, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { FaUserGear } from "react-icons/fa6";
 import { FiLoader } from "react-icons/fi";
 import { HiBuildingStorefront } from "react-icons/hi2";
 import { PiStudentFill } from "react-icons/pi";
 import MapPicker from "@/Components/custom/MapPicker";
+import { Separator } from "@/Components/ui/separator";
 
 type AdminWorkshopShowProps = {
     title: string;
@@ -49,7 +50,6 @@ export default function AdminWorkshopShow({
             <PageTitle
                 title={title as string}
                 description="Detail informasi DuDi"
-                backUrl="/admin/workshop"
             />
 
             <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
@@ -107,10 +107,16 @@ export default function AdminWorkshopShow({
                             keyIdentifier="NIP"
                             value={workshop.supervisor?.nip ?? "-"}
                         />
-                        <KeyAndValue
-                            keyIdentifier="Nama"
-                            value={workshop.supervisor?.full_name ?? "-"}
-                        />
+                        <Link
+                            className="flex items-center gap-1 justify-start text-green-700 hover:text-green-800 w-fit"
+                            href={`/admin/supervisor/${workshop?.supervisor.id}`}
+                        >
+                            <KeyAndValue
+                                keyIdentifier="Nama"
+                                value={`${workshop?.supervisor.full_name} `}
+                            />
+                            <ChevronRight className="mt-3" size={18} />
+                        </Link>
                         <KeyAndValue
                             keyIdentifier="Email"
                             value={workshop.supervisor?.user?.email ?? "-"}
@@ -124,7 +130,7 @@ export default function AdminWorkshopShow({
                     <div className="flex items-center gap-2 mb-3">
                         <PiStudentFill className="text-slate-500" size={18} />
                         <h3 className="text-lg font-semibold">
-                            Siswa PKL (Peserta Didik)
+                            Siswa PKL ({workshop.students?.length ?? 0})
                         </h3>
                     </div>
                     <div className="flex flex-col gap-1">
@@ -141,35 +147,46 @@ export default function AdminWorkshopShow({
                     </div>
                 ) : (
                     <div className="flex overflow-x-auto z-10 snap-x snap-mandatory">
-                        <div className="flex gap-4">
-                            {workshop.students.map((student) => (
+                        {workshop.students?.length ? (
+                            workshop.students.map((student, index) => (
                                 <div
                                     key={student.id}
-                                    className="min-w-full flex-shrink-0 snap-center"
+                                    className="flex flex-col gap-1 snap-center min-w-full"
                                 >
-                                    <div className="flex flex-col gap-1 mb-2">
+                                    <Link
+                                        className="flex items-center gap-1 justify-start text-green-700 hover:text-green-800 w-fit"
+                                        href={`/admin/student/${student?.id}`}
+                                    >
                                         <KeyAndValue
                                             dense={true}
                                             keyIdentifier="NIS"
-                                            value={student.nis ?? "-"}
+                                            value={`${student?.nis} `}
                                         />
-                                        <KeyAndValue
-                                            dense={true}
-                                            keyIdentifier="Nama"
-                                            value={student.full_name ?? "-"}
+                                        <ChevronRight
+                                            className="mt-5"
+                                            size={18}
                                         />
-                                        <KeyAndValue
-                                            keyIdentifier="Kelas & Jurusan"
-                                            value={`${
-                                                student.class ?? "Tanpa kelas"
-                                            } - ${
-                                                student.major ?? "Tanpa jurusan"
-                                            }`}
-                                        />
-                                    </div>
+                                    </Link>
+                                    <KeyAndValue
+                                        dense={true}
+                                        keyIdentifier="Nama"
+                                        value={student.full_name ?? "-"}
+                                    />
+                                    <KeyAndValue
+                                        keyIdentifier="Kelas & Jurusan"
+                                        value={`${
+                                            student.class ?? "Tanpa kelas"
+                                        } - ${
+                                            student.major ?? "Tanpa jurusan"
+                                        }`}
+                                    />
                                 </div>
-                            ))}
-                        </div>
+                            ))
+                        ) : (
+                            <span>
+                                Tidak ada siswa yang terdaftar pada DuDi ini
+                            </span>
+                        )}
                     </div>
                 )}
             </Card>

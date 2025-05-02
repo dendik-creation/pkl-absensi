@@ -57,7 +57,6 @@ export default function AdminStudentIndex({
             <PageTitle
                 title={title as string}
                 description="Seluruh informasi siswa yang terdafar disistem"
-                backUrl="/admin/dashboard"
             />
 
             <SearchInput

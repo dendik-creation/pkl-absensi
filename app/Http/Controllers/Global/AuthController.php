@@ -13,13 +13,13 @@ class AuthController extends Controller
 {
     public function SignedInStatus(){
         $auth = Auth::user();
-        if(!$auth) return Inertia::location('auth/signin');
+        if(!$auth) return Inertia::location('/auth/signin');
 
         // Redirect By Role
         $role = $auth->role;
-        if($role == 'ADMIN') return Inertia::location('admin/dashboard');
-        if($role == 'STUDENT') return Inertia::location('student/dashboard');
-        if($role == 'SUPERVISOR') return Inertia::location('supervisor/dashboard');
+        if($role == 'ADMIN') return Inertia::location('/admin/dashboard');
+        if($role == 'STUDENT') return Inertia::location('/student/dashboard');
+        if($role == 'SUPERVISOR') return Inertia::location('/supervisor/dashboard');
     }
 
     public function signIn(Request $request){
@@ -33,14 +33,28 @@ class AuthController extends Controller
             'password' => $request->input('password')
         ];
 
-        $user = User::where('username', $credentials['username'])->first();
+        $user = User::where(function ($query) use ($credentials) {
+            $query->where('username', $credentials['username'])
+                  ->orWhere('email', $credentials['username']);
+        })->first();
+
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return back()->withErrors([
                 'message' => 'Username atau password salah'
             ]);
         }
 
-        if (Auth::attempt($credentials)) {
+        $authCredentials = [
+            'password' => $credentials['password']
+        ];
+
+        if (!is_null($user->username) && $user->username === $credentials['username']) {
+            $authCredentials['username'] = $user->username;
+        } else {
+            $authCredentials['email'] = $user->email;
+        }
+
+        if (Auth::attempt($authCredentials)) {
             return Inertia::location('/');
         }
 
