@@ -25,8 +25,8 @@ class AttendanceSeed extends Seeder
         ]);
         Attendance::create([
             'student_id' => 1,
-            'check_in' => now()->format('Y-m-d') . ' 09:05:47',
-            'check_out' => now()->format('Y-m-d') . ' 16:30:12',
+            'check_in' => now()->subDays(1)->format('Y-m-d') . ' 09:05:47',
+            'check_out' => now()->subDays(1)->format('Y-m-d') . ' 16:30:12',
             'status' => 'PRESENT',
             'latitude_in' => -6.826408 + (20 / 111320),
             'longitude_in' => 110.876416 + (20 / (111320 * cos(deg2rad(-6.826408)))),
@@ -35,8 +35,8 @@ class AttendanceSeed extends Seeder
         ]);
         Attendance::create([
             'student_id' => 1,
-            'check_in' => now()->format('Y-m-d') . ' 10:20:14',
-            'check_out' => now()->format('Y-m-d') . ' 19:10:45',
+            'check_in' => now()->subDays(2)->format('Y-m-d') . ' 10:20:14',
+            'check_out' => now()->subDays(2)->format('Y-m-d') . ' 19:10:45',
             'status' => 'PRESENT',
             'latitude_in' => -6.826408 + (20 / 111320),
             'longitude_in' => 110.876416 + (20 / (111320 * cos(deg2rad(-6.826408)))),
