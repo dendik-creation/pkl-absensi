@@ -58,14 +58,17 @@ class AttendanceController extends Controller
         $user = $this->getAuthUser();
         $student = Student::with('workshop')->where('id', $user->student->id)->first();
 
-        $existingAttendance = Attendance::where('student_id', $student->id)
+        $existingAttendanceInToday = Attendance::where('student_id', $student->id)
             ->whereDate('check_in', $now)
-            ->orWhereDate('check_out', $now)
             ->exists();
 
-        $nowTime = now()->format('H:i:s');
-        if ($existingAttendance || $nowTime < $setting->check_in_start || $nowTime > $setting->check_out_end) {
+        if ($attendance_time_name == "DI LUAR WAKTU") {
             Session::flash('error', 'Diluar waktu absensi, akses ditolak 😁');
+            return back();
+        }
+
+        if($attendance_time_name == "PULANG" && !$existingAttendanceInToday){
+            Session::flash('error', 'Kamu di nyatakan tidak absensi hari ini, akses ditolak 😁');
             return back();
         }
 

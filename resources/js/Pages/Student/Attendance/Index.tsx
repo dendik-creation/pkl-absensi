@@ -5,6 +5,7 @@ import { Card } from "@/Components/ui/card";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { isWithinTimeRange, ymdToIdDate } from "@/Services/additionalService";
+import { Attendance } from "@/Types/attendance";
 import { Link, usePage } from "@inertiajs/react";
 import { ChevronRight } from "lucide-react";
 import React, { useState } from "react";
@@ -89,7 +90,8 @@ export default function StudentAttendanceIndex({
                     setting.check_out_end,
                     currentTime
                 ) &&
-                !todayAttendedOut && (
+                !todayAttendedOut &&
+                todayAttendedIn && (
                     <Link
                         href={
                             "/student/attendance/create?utm_source=student_attendance"
