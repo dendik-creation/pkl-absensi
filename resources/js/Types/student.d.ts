@@ -12,6 +12,8 @@ export type Student = {
     workshop_id?: number | null;
     user: User;
     workshop?: Workshop | null;
+    attendances?: Attendance[];
+    journals?: Journal[];
     createdAt: Date;
     updatedAt: Date;
 };

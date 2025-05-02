@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
             $table->dateTime('check_in')->nullable();
             $table->dateTime('check_out')->nullable();
             $table->enum('status', ['PRESENT', 'EXCUSED', 'ABSENT']);
-            $table->string('reason')->nullable();
-            $table->double('latitude')->nullable();
-            $table->double('longitude')->nullable();
+            $table->double('latitude_in')->nullable();
+            $table->double('longitude_in')->nullable();
+            $table->double('latitude_out')->nullable();
+            $table->double('longitude_out')->nullable();
+            $table->text('reason')->nullable();
             $table->timestamps();
         });
     }

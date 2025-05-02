@@ -106,6 +106,15 @@ class SupervisorController extends Controller
             ];
         });
 
+        if($supervisor->workshops != null && count($supervisor->workshops) > 0) {
+            foreach ($supervisor->workshops as $workshop) {
+                $workshops->push([
+                    'value' => '' . $workshop->id . '',
+                    'label' => $workshop->name,
+                ]);
+            }
+        }
+
         return Inertia::render('Admin/Supervisor/Edit', [
             'title' => 'Edit Pembimbing',
             'supervisor' => $supervisor,
@@ -124,22 +133,25 @@ class SupervisorController extends Controller
 
         if ($request->workshop_id && is_array($request->workshop_id)) {
             $conflictingWorkshops = Workshop::whereIn('id', $request->workshop_id)
-                ->whereNotNull('supervisor_id')
-                ->where('supervisor_id', '!=', $id)
-                ->exists();
+            ->whereNotNull('supervisor_id')
+            ->where('supervisor_id', '!=', $id)
+            ->exists();
 
             if ($conflictingWorkshops) {
-                return back()->withErrors([
-                    'message' => 'Beberapa DuDi sudah memiliki pembimbing yang ditugaskan',
-                ]);
+            return back()->withErrors([
+                'message' => 'Beberapa DuDi sudah memiliki pembimbing yang ditugaskan',
+            ]);
             }
 
             Workshop::whereIn('id', $request->workshop_id)
-                ->update(['supervisor_id' => $id]);
+            ->update(['supervisor_id' => $id]);
 
             Workshop::where('supervisor_id', $id)
-                ->whereNotIn('id', $request->workshop_id)
-                ->update(['supervisor_id' => null]);
+            ->whereNotIn('id', $request->workshop_id)
+            ->update(['supervisor_id' => null]);
+        } else {
+            Workshop::where('supervisor_id', $id)
+            ->update(['supervisor_id' => null]);
         }
 
         if ($supervisor->nip !== $request->nip) {

@@ -17,4 +17,14 @@ class Student extends Model
     {
         return $this->belongsTo(Workshop::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function journals()
+    {
+        return $this->hasMany(Journal::class);
+    }
 }

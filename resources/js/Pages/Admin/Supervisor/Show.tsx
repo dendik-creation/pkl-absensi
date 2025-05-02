@@ -99,46 +99,59 @@ export default function AdminSupervisorShow({
                         <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-amber-100 to-white rounded-l-md"></div>
                         <div className="flex overflow-x-auto z-10 snap-x snap-mandatory">
                             <div className="flex gap-4">
-                                {supervisor?.workshops?.map((workshop) => (
-                                    <div
-                                        key={workshop.id}
-                                        className="min-w-full flex-shrink-0 snap-center"
-                                    >
-                                        <div className="flex flex-col gap-1 mb-2">
-                                            <Link
-                                                className="flex items-center gap-1 justify-start text-amber-700 hover:text-amber-800"
-                                                href={`/admin/workshop/${workshop?.id}`}
-                                            >
+                                {supervisor?.workshops?.length > 0 ? (
+                                    supervisor?.workshops?.map((workshop) => (
+                                        <div
+                                            key={workshop.id}
+                                            className="min-w-full flex-shrink-0 snap-center"
+                                        >
+                                            <div className="flex flex-col gap-1 mb-2">
+                                                <Link
+                                                    className="flex items-center gap-1 justify-start text-amber-700 hover:text-amber-800"
+                                                    href={`/admin/workshop/${workshop?.id}`}
+                                                >
+                                                    <KeyAndValue
+                                                        keyIdentifier="Nama DuDi"
+                                                        value={`${workshop?.name} `}
+                                                    />
+                                                    <ChevronRight
+                                                        className="mt-3"
+                                                        size={18}
+                                                    />
+                                                </Link>
                                                 <KeyAndValue
-                                                    keyIdentifier="Nama DuDi"
-                                                    value={`${workshop?.name} `}
+                                                    dense={true}
+                                                    keyIdentifier="Nama Pemilik"
+                                                    value={
+                                                        workshop.owner_name ??
+                                                        "-"
+                                                    }
                                                 />
-                                                <ChevronRight
-                                                    className="mt-3"
-                                                    size={18}
+                                                <KeyAndValue
+                                                    dense={true}
+                                                    keyIdentifier="No Telepon"
+                                                    value={
+                                                        workshop.phone ?? "-"
+                                                    }
                                                 />
-                                            </Link>
-                                            <KeyAndValue
-                                                dense={true}
-                                                keyIdentifier="Nama Pemilik"
-                                                value={
-                                                    workshop.owner_name ?? "-"
-                                                }
-                                            />
-                                            <KeyAndValue
-                                                dense={true}
-                                                keyIdentifier="No Telepon"
-                                                value={workshop.phone ?? "-"}
-                                            />
-                                            <KeyAndValue
-                                                dense={true}
-                                                keyIdentifier="Alamat"
-                                                className="max-w-sm"
-                                                value={workshop.address ?? "-"}
-                                            />
+                                                <KeyAndValue
+                                                    dense={true}
+                                                    keyIdentifier="Alamat"
+                                                    className="max-w-sm"
+                                                    value={
+                                                        workshop.address ?? "-"
+                                                    }
+                                                />
+                                            </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col z-10">
+                                        <span>
+                                            Pembimbing tidak terdaftar pada DuDi
+                                        </span>
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     </Card>
@@ -174,8 +187,8 @@ export default function AdminSupervisorShow({
                         ) === 0 ? (
                             <div className="flex flex-col z-10">
                                 <span>
-                                    Tidak ada siswa PKL yang terdaftar pada DuDi
-                                    ini
+                                    Tidak ada siswa yang didampingi oleh
+                                    pembimbing
                                 </span>
                             </div>
                         ) : (

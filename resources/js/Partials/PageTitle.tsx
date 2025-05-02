@@ -17,7 +17,7 @@ export const PageTitle = ({
 
     return (
         <div className="flex mt-3 justify-start items-center gap-5 mb-8">
-            {!url.includes("dashboard") && (
+            {!url.split("?")[0].includes("dashboard") && (
                 <Button
                     onClick={handleBack}
                     className="h-full py-5"

@@ -33,8 +33,8 @@ class StudentController extends Controller
         $student = Student::with('user', 'workshop.supervisor')->findOrFail($id);
         $currentDate = now()->format('Y-m-d');
         $latest_activity = [
-            'attendance' => $student->user->attendances()->whereDate('check_in', $currentDate)->latest()->first(),
-            'journal' => $student->user->journals()->whereDate('date', $currentDate)->latest()->first(),
+            'attendance' => $student->attendances()->whereDate('check_in', $currentDate)->latest()->first(),
+            'journal' => $student->journals()->whereDate('date', $currentDate)->latest()->first(),
         ];
 
         return Inertia::render('Admin/Student/Show', [

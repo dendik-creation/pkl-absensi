@@ -53,7 +53,7 @@ export default function SignIn() {
                                 </span>
                                 <Input
                                     type="text"
-                                    placeholder="Username"
+                                    placeholder="Username atau Email"
                                     value={data.username}
                                     onChange={(e) =>
                                         setData("username", e.target.value)
