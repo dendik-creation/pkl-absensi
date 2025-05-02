@@ -1,4 +1,4 @@
-import { TriangleAlert, Search, CircleX } from "lucide-react";
+import { TriangleAlert, Search, CircleX, CalendarIcon } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "../ui/input";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -25,6 +25,9 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/Components/ui/drawer";
+import { Calendar } from "@/Components/ui/calendar";
+import { ymdToIdDate } from "@/Services/additionalService";
+import RichTextEditor from "@mantine/rte";
 
 type ErrorInputProps = {
     error: string | null;
@@ -253,6 +256,120 @@ export function MultiSelectSearchInput({
                 </Command>
             </PopoverContent>
         </Popover>
+    );
+}
+
+export const DatePickerInput = ({
+    value,
+    onChange,
+    placeholder = "Pilih tanggal",
+    mode = "single",
+    className,
+}: {
+    value: string | undefined;
+    onChange: (date: string | undefined) => void;
+    placeholder?: string;
+    mode: "single" | "multiple" | "range";
+    className?: string;
+}) => {
+    const formatDate = (date: string | undefined) => {
+        if (!date) return placeholder;
+
+        const formattedDate = new Date(date)
+            .toLocaleDateString("id-ID", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            })
+            .split("/")
+            .reverse()
+            .join("-");
+
+        return ymdToIdDate(formattedDate);
+    };
+
+    const handleSelect = (
+        date: Date | Date[] | { from: Date; to: Date } | undefined
+    ) => {
+        if (!date) {
+            onChange(undefined);
+            return;
+        }
+
+        const formatSingleDate = (d: Date) =>
+            d
+                .toLocaleDateString("id-ID", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                })
+                .split("/")
+                .reverse()
+                .join("-");
+
+        if (mode === "single") {
+            onChange(formatSingleDate(date as Date));
+        } else if (mode === "multiple" && Array.isArray(date)) {
+            onChange(date.map(formatSingleDate).join(","));
+        } else if (mode === "range") {
+            const range = date as { from: Date; to: Date };
+            onChange(
+                `${formatSingleDate(range.from)} - ${formatSingleDate(
+                    range.to
+                )}`
+            );
+        }
+    };
+
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    className={cn(
+                        "w-full pl-3 h-12 text-left font-normal",
+                        !value && "text-muted-foreground",
+                        className
+                    )}
+                >
+                    <span>{formatDate(value)}</span>
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+                <Calendar
+                    mode={mode}
+                    selected={value ? new Date(value) : undefined}
+                    onSelect={handleSelect}
+                    initialFocus
+                />
+            </PopoverContent>
+        </Popover>
+    );
+};
+
+export default function RichTextEditorInput({
+    content,
+    onChange,
+}: {
+    content: string;
+    onChange: (value: string) => void;
+}) {
+    return (
+        <RichTextEditor
+            value={content}
+            onChange={onChange}
+            sticky={true}
+            className="rounded-md border h-[400px] overflow-auto"
+            controls={[
+                ["bold", "italic", "underline"],
+                ["unorderedList", "orderedList"],
+                ["h1", "h2", "h3"],
+                ["sup", "sub"],
+                ["link", "image"],
+                ["clean"],
+            ]}
+        />
     );
 }
 

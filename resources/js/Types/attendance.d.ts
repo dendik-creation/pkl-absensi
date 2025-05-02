@@ -1,3 +1,5 @@
+import { Student } from "./student";
+
 enum AttendanceStatus {
     PRESENT = "PRESENT",
     EXCUSED = "EXCUSED",
@@ -5,7 +7,7 @@ enum AttendanceStatus {
 }
 type Attendance = {
     id: number;
-    user_id: number;
+    student_id: number;
     check_in?: string | null;
     check_out?: string | null;
     reason?: string | null;
@@ -16,4 +18,5 @@ type Attendance = {
     longitude_out?: number | null;
     radius_gap_attendance_in?: number | null;
     radius_gap_attendance_out?: number | null;
+    student?: Student;
 };

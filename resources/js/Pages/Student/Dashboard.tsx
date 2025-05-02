@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
+import { HiBuildingStorefront } from "react-icons/hi2";
 
 type StudentDashboardProps = {
     title?: string;
@@ -77,9 +78,9 @@ export default function StudentDashboard({
             url: "/student/journal",
         },
         {
-            icon: <DatabaseZap size={24} color="#36454F" />,
-            label: "Export Data",
-            url: "/student/data-export",
+            icon: <HiBuildingStorefront size={24} color="#36454F" />,
+            label: "DuDi Kamu",
+            url: "/student/workshop",
         },
     ];
     return (

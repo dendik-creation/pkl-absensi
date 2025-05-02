@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\SupervisorController as AdminSupervisor;
 
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Student\AttendanceController as StudentAttendance;
+use App\Http\Controllers\Student\JournalController as StudentJournal;
 
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
@@ -70,6 +71,16 @@ Route::middleware('auth')->group(function(){
             Route::get('/create', 'create');
             Route::get('/{id}', 'show');
             Route::post('/', 'store');
+        });
+
+        Route::prefix('/journal')->controller(StudentJournal::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/create', 'create');
+            Route::get('/{id}', 'show');
+            Route::get('/{id}/edit', 'edit');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
         });
     });
 });

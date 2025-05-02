@@ -42,7 +42,7 @@ class AttendanceController extends Controller
         $user = $this->getAuthUser();
         $setting = GlobalSetting::first();
         $attendance_time_name = $this->currentAttendanceTime($setting);
-        $attendances = Attendance::where('student_id', $user->student->id)->get();
+        $attendances = Attendance::where('student_id', $user->student->id)->limit(20)->orderBy('check_in', 'desc')->get();
         return inertia('Student/Attendance/Index', [
             'title' => 'Daftar Absensi',
             'attendances' => $attendances,
