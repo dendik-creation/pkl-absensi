@@ -14,10 +14,10 @@ export default function Header({ title }: { title?: string }) {
     };
 
     return (
-        <header className="bg-white px-5 z-[999] flex items-center justify-between border-b">
+        <header className="bg-white px-5 z-[999] flex items-center justify-between rounded-b-md border-b">
             <Link href="/" className="flex items-center gap-2">
                 <img
-                    src="/assets/img/smk-bisa-hebat.png"
+                    src="/assets/img/favicon.png"
                     alt="Header Image"
                     className="h-16"
                 />

@@ -36,7 +36,7 @@ export default function SignIn() {
             <Card className="w-full max-w-xl shadow-md mx-4">
                 <CardHeader>
                     <img
-                        src="/assets/img/smk-bisa-hebat.png"
+                        src="/assets/img/favicon.png"
                         alt="Icon Image"
                         className="mx-auto bg-cover h-32"
                     />

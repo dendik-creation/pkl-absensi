@@ -6,6 +6,8 @@ import { Card } from "@/Components/ui/card";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { ymdToIdDate } from "@/Services/additionalService";
+import { Attendance } from "@/Types/attendance";
+import { Journal } from "@/Types/journal";
 import { Student } from "@/Types/student";
 import { Link, useForm } from "@inertiajs/react";
 import { ChevronRight, IdCard, Pencil, Trash } from "lucide-react";
@@ -138,30 +140,36 @@ export default function AdminStudentShow({
                     </div>
                 </div>
                 <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-blue-100 to-white rounded-l-md"></div>
-                <div className="flex flex-col z-10">
-                    <Link
-                        className="flex items-center gap-1 justify-start text-blue-700 hover:text-blue-800"
-                        href={`/admin/workshop/${student?.workshop?.id}`}
-                    >
+                {student.workshop == null ? (
+                    <p className="text-base z-10">
+                        Siswa tidak memiliki tempat PKL
+                    </p>
+                ) : (
+                    <div className="flex flex-col z-10">
+                        <Link
+                            className="flex items-center gap-1 justify-start text-blue-700 hover:text-blue-800"
+                            href={`/admin/workshop/${student?.workshop?.id}`}
+                        >
+                            <KeyAndValue
+                                keyIdentifier="Nama DuDi"
+                                value={`${student?.workshop?.name} `}
+                            />
+                            <ChevronRight className="mt-3" size={18} />
+                        </Link>
                         <KeyAndValue
-                            keyIdentifier="Nama DuDi"
-                            value={`${student?.workshop?.name} `}
+                            keyIdentifier="Nama Pemilik"
+                            value={student.workshop?.owner_name}
                         />
-                        <ChevronRight className="mt-3" size={18} />
-                    </Link>
-                    <KeyAndValue
-                        keyIdentifier="Nama Pemilik"
-                        value={student.workshop?.owner_name}
-                    />
-                    <KeyAndValue
-                        keyIdentifier="Telepon"
-                        value={student.workshop?.phone}
-                    />
-                    <KeyAndValue
-                        keyIdentifier="Alamat"
-                        value={student.workshop?.address}
-                    />
-                </div>
+                        <KeyAndValue
+                            keyIdentifier="Telepon"
+                            value={student.workshop?.phone}
+                        />
+                        <KeyAndValue
+                            keyIdentifier="Alamat"
+                            value={student.workshop?.address}
+                        />
+                    </div>
+                )}
             </Card>
             <Card className="shadow-md p-4 mb-4 flex flex-col relative overflow-hidden">
                 <div className="z-10">
