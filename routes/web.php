@@ -15,6 +15,7 @@ use App\Http\Controllers\Student\AttendanceController as StudentAttendance;
 use App\Http\Controllers\Student\JournalController as StudentJournal;
 use App\Http\Controllers\Student\WorkshopController as StudentWorkshop;
 
+use App\Http\Controllers\Supervisor\DashboardController as SupervisorDashboard;
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
 Route::prefix('auth')->group(function () {
@@ -87,5 +88,10 @@ Route::middleware('auth')->group(function(){
         Route::prefix('/workshop')->controller(StudentWorkshop::class)->group(function () {
             Route::get('/', 'index');
         });
+    });
+
+    // Supervisor Access
+    Route::prefix('supervisor')->group(function () {
+        Route::get('/dashboard', [SupervisorDashboard::class, 'index']);
     });
 });

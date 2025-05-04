@@ -19,13 +19,14 @@ import {
     ChevronRight,
     ClipboardCheck,
     Clock8,
-    DatabaseZap,
     Hourglass,
     NotebookText,
 } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import { HiBuildingStorefront } from "react-icons/hi2";
+import { Attendance } from "@/Types/attendance";
+import { Journal } from "@/Types/journal";
 
 type StudentDashboardProps = {
     title?: string;
