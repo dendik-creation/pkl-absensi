@@ -156,12 +156,6 @@ class StudentController extends Controller
         Excel::import(new StudentImport(), $filePath);
         Session::flash('success', 'File berhasil diunggah dan disimpan.');
         return Inertia::location('/admin/student');
-        // try {
-        // } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-        //     return back()->withErrors([
-        //         'message' => 'Terjadi kesalahan saat proses import',
-        //     ]);
-        // }
     }
 
     public function destroy($id)

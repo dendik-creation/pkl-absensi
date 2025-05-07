@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function(){
             Route::get('/{id}', 'show');
             Route::get('/{id}/edit', 'edit');
             Route::post('/', 'store');
+            Route::post('/import', 'import');
             Route::put('/{id}', 'update');
             Route::delete('/{id}', 'destroy');
         });
