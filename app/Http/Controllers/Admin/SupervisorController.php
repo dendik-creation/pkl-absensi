@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\SupervisorImport;
 use App\Models\Supervisor;
 use App\Models\User;
 use App\Models\Workshop;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SupervisorController extends Controller
 {
@@ -166,6 +168,33 @@ class SupervisorController extends Controller
         ]);
 
         Session::flash('success', 'Pembimbing berhasil diperbarui');
+        return Inertia::location('/admin/supervisor');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            $request->validate([
+                'file_excel' => 'required|mimes:xlsx|max:2048|file',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors([
+                'message' => 'File yang diunggah tidak valid. Pastikan format dan ukuran file sesuai.',
+            ]);
+        }
+
+        $file = $request->file('file_excel');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs('private/import/supervisors', $fileName);
+
+        try {
+            Excel::import(new SupervisorImport(), $filePath);
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'message' => $e->getMessage(),
+            ]);
+        }
+        Session::flash('success', 'File berhasil diunggah dan disimpan.');
         return Inertia::location('/admin/supervisor');
     }
 
