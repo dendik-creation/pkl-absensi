@@ -8,28 +8,33 @@ import {
 import { PiStudentFill } from "react-icons/pi";
 import { FaUserGear } from "react-icons/fa6";
 import { HiBuildingStorefront } from "react-icons/hi2";
-import MenuListInDashboard from "@/Components/custom/MenuListInDashboard";
-import { MenuItem } from "@/Types/menu";
 import clsx from "clsx";
 import { ApexBarChart, ChartNoData } from "@/Components/custom/Charts";
 import { RiAdminLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { Clock8 } from "lucide-react";
+import { DashboardMenuItemWithData } from "@/Components/custom/MenuListInDashboard";
 
 type AdminDashboardProps = {
     title?: string;
-    attendances: {
-        month: string;
-        present: number;
-        excused: number;
-        absent: number;
-    }[];
+    data: {
+        cards: {
+            student_count: number;
+            workshop_count: number;
+            supervisor_count: number;
+        };
+        charts: {
+            attendances: {
+                month: string;
+                present: number;
+                excused: number;
+                absent: number;
+            }[];
+        };
+    };
 };
 
-export default function AdminDashboard({
-    title,
-    attendances,
-}: AdminDashboardProps) {
+export default function AdminDashboard({ title, data }: AdminDashboardProps) {
     const [currentTime, setCurrentTime] = useState(new Date().toISOString());
 
     useEffect(() => {
@@ -39,37 +44,28 @@ export default function AdminDashboard({
 
         return () => clearInterval(interval);
     }, []);
-    const menuItems: MenuItem[] = [
-        {
-            icon: <PiStudentFill size={24} color="#36454F" />,
-            label: "Data Siswa",
-            url: "/admin/student",
-        },
-        {
-            icon: <HiBuildingStorefront size={24} color="#36454F" />,
-            label: "Data DuDi (Bengkel)",
-            url: "/admin/workshop",
-        },
-        {
-            icon: <FaUserGear size={24} color="#36454F" />,
-            label: "Data Pembimbing",
-            url: "/admin/supervisor",
-        },
-    ];
     const attedance = {
-        categories: attendances?.map((attendance) => attendance.month),
+        categories: data?.charts?.attendances?.map(
+            (attendance) => attendance.month
+        ),
         series: [
             {
                 name: "Hadir",
-                data: attendances?.map((attendance) => attendance.present),
+                data: data?.charts?.attendances?.map(
+                    (attendance) => attendance.present
+                ),
             },
             {
                 name: "Izin",
-                data: attendances?.map((attendance) => attendance.excused),
+                data: data?.charts?.attendances?.map(
+                    (attendance) => attendance.excused
+                ),
             },
             {
                 name: "Alpha",
-                data: attendances?.map((attendance) => attendance.absent),
+                data: data?.charts?.attendances?.map(
+                    (attendance) => attendance.absent
+                ),
             },
         ],
     };
@@ -134,25 +130,47 @@ export default function AdminDashboard({
                         </div>
                     </Card>
                 </div>
-                <MenuListInDashboard className="mb-6" menuItems={menuItems} />
-                <div className="mt-6">
-                    {attendances.every(
-                        (attendance) =>
-                            attendance.present === 0 &&
-                            attendance.excused == 0 &&
-                            attendance.absent == 0
-                    ) ? (
-                        <ChartNoData title="Rekap Kehadiran" />
-                    ) : (
-                        <ApexBarChart
-                            title="Rekap Kehadiran"
-                            description="Rekap kehadiran siswa dalam 3 bulan"
-                            categories={attedance.categories}
-                            series={attedance.series}
-                            colors={["#93C5FD", "#FDE68A", "#FCA5A5"]}
-                            height={300}
+                <div className="mt-3">
+                    <div className="mb-6 grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <DashboardMenuItemWithData
+                            label="Jumlah Siswa"
+                            value={data?.cards?.student_count.toString()}
+                            icon={<PiStudentFill size={80} />}
+                            url="/admin/student"
                         />
-                    )}
+                        <DashboardMenuItemWithData
+                            label="Jumlah DuDi"
+                            value={data?.cards?.workshop_count.toString()}
+                            icon={<HiBuildingStorefront size={80} />}
+                            url="/admin/workshop"
+                        />
+                        <DashboardMenuItemWithData
+                            label="Jumlah Pembimbing"
+                            value={data?.cards?.supervisor_count.toString()}
+                            icon={<FaUserGear size={80} />}
+                            url="/admin/supervisor"
+                            className="col-span-2 md:col-span-1"
+                        />
+                    </div>
+                    <div className="">
+                        {data?.charts?.attendances.every(
+                            (attendance) =>
+                                attendance.present === 0 &&
+                                attendance.excused == 0 &&
+                                attendance.absent == 0
+                        ) ? (
+                            <ChartNoData title="Rekap Kehadiran" />
+                        ) : (
+                            <ApexBarChart
+                                title="Rekap Kehadiran"
+                                description="Rekap kehadiran siswa dalam 3 bulan"
+                                categories={attedance.categories}
+                                series={attedance.series}
+                                colors={["#93C5FD", "#FDE68A", "#FCA5A5"]}
+                                height={300}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
         </MainLayout>

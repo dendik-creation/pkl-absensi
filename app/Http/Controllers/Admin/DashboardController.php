@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Student;
+use App\Models\Supervisor;
 use App\Models\User;
+use App\Models\Workshop;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -55,7 +57,16 @@ class DashboardController extends Controller
     {
         return Inertia::render('Admin/Dashboard', [
             'title' => 'Dashboard Admin',
-            'attendances' => $this->getAttedanceChart(),
+            'data' => [
+                'cards' => [
+                    'student_count' => Student::count(),
+                    'supervisor_count' => Supervisor::count(),
+                    'workshop_count' => Workshop::count(),
+                ],
+                'charts' => [
+                    'attendances' => $this->getAttedanceChart(),
+                ],
+            ]
         ]);
     }
 }
