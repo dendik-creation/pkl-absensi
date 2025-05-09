@@ -13,7 +13,11 @@ import { ApexBarChart, ChartNoData } from "@/Components/custom/Charts";
 import { RiAdminLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { Clock8 } from "lucide-react";
-import { DashboardMenuItemWithData } from "@/Components/custom/MenuListInDashboard";
+import {
+    DashboardMenuItemWithData,
+    TableListInDashboard,
+} from "@/Components/custom/MenuListInDashboard";
+import { Attendance } from "@/Types/attendance";
 
 type AdminDashboardProps = {
     title?: string;
@@ -30,6 +34,9 @@ type AdminDashboardProps = {
                 excused: number;
                 absent: number;
             }[];
+        };
+        lists: {
+            latest_attendances: Attendance[];
         };
     };
 };
@@ -152,7 +159,7 @@ export default function AdminDashboard({ title, data }: AdminDashboardProps) {
                             className="col-span-2 md:col-span-1"
                         />
                     </div>
-                    <div className="">
+                    <div className="mb-5">
                         {data?.charts?.attendances.every(
                             (attendance) =>
                                 attendance.present === 0 &&
@@ -170,6 +177,29 @@ export default function AdminDashboard({ title, data }: AdminDashboardProps) {
                                 height={300}
                             />
                         )}
+                    </div>
+                    <div className="mb-5">
+                        <TableListInDashboard
+                            title="Absensi Terbaru"
+                            description="5 absensi terbaru yang tercatat"
+                            headers={["Siswa", "Tanggal", "Waktu", "Status"]}
+                            columnsData={data?.lists?.latest_attendances.map(
+                                (attendance) => [
+                                    `${attendance.student?.nis} - ${attendance.student?.full_name}`,
+                                    ymdToIdDate(attendance.check_in),
+                                    ymdToIdDate(
+                                        attendance.check_in,
+                                        true,
+                                        true
+                                    ),
+                                    attendance.status == "PRESENT"
+                                        ? "HADIR"
+                                        : attendance.status == "EXCUSED"
+                                        ? "IZIN"
+                                        : "ALPHA",
+                                ]
+                            )}
+                        />
                     </div>
                 </div>
             </div>

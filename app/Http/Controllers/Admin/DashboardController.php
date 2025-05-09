@@ -53,6 +53,15 @@ class DashboardController extends Controller
         return $attendanceData;
     }
 
+    private function latestAttendances()
+    {
+        $attendances = Attendance::with('student.workshop')
+            ->latest()
+            ->take(5)
+            ->get();
+        return $attendances;
+    }
+
     public function index()
     {
         return Inertia::render('Admin/Dashboard', [
@@ -65,6 +74,9 @@ class DashboardController extends Controller
                 ],
                 'charts' => [
                     'attendances' => $this->getAttedanceChart(),
+                ],
+                'lists' => [
+                    'latest_attendances' => $this->latestAttendances(),
                 ],
             ]
         ]);

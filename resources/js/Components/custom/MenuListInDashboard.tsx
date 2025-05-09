@@ -73,3 +73,55 @@ export function DashboardMenuItemWithData({
         </Card>
     );
 }
+
+export const TableListInDashboard = ({
+    title,
+    description,
+    headers,
+    columnsData,
+}: {
+    title: string;
+    description: string;
+    headers: string[];
+    columnsData: any[][];
+}) => {
+    return (
+        <Card className="p-3 flex flex-col w-full relative overflow-hidden shadow-md">
+            <h2 className="text-lg font-bold">{title}</h2>
+            <p className="text-sm text-gray-500 mb-4">{description}</p>
+            <div className="overflow-x-auto">
+                <table className="w-full table-auto min-w-[600px]">
+                    <thead>
+                        <tr>
+                            {headers.map((header, index) => (
+                                <th
+                                    key={index}
+                                    className="px-4 py-2 text-left font-semibold text-gray-700"
+                                >
+                                    {header}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {columnsData.map((row, index) => (
+                            <tr
+                                key={index}
+                                className="border-b hover:bg-gray-50"
+                            >
+                                {row.map((cell, cellIndex) => (
+                                    <td
+                                        key={cellIndex}
+                                        className="px-4 py-2 text-sm text-gray-700"
+                                    >
+                                        {cell}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </Card>
+    );
+};
