@@ -12,7 +12,10 @@ import { PageTitle } from "@/Partials/PageTitle";
 import MapPicker from "@/Components/custom/MapPicker";
 import "leaflet/dist/leaflet.css";
 import { Textarea } from "@/Components/ui/textarea";
-import { getFullAddress } from "@/Services/additionalService";
+import {
+    getFullAddress,
+    handleNumericInput,
+} from "@/Services/additionalService";
 
 type AdminWorkshopCreateProps = {
     title?: string;
@@ -26,6 +29,7 @@ export default function AdminWorkshopCreate({
     title,
     supervisors,
 }: AdminWorkshopCreateProps) {
+    const [onFindingAddress, setOnFindingAddress] = React.useState(false);
     const { data, setData, post, processing, errors, setError, clearErrors } =
         useForm({
             name: "",
@@ -33,8 +37,8 @@ export default function AdminWorkshopCreate({
             phone: "",
             address: "",
             supervisor_id: "",
-            latitude: "",
-            longitude: "",
+            latitude: null as number | null,
+            longitude: null as number | null,
         });
 
     const handleErrorInput = () => {
@@ -43,8 +47,8 @@ export default function AdminWorkshopCreate({
             { key: "owner_name", message: "Nama Pemilik tidak boleh kosong" },
             { key: "phone", message: "Telepon tidak boleh kosong" },
             { key: "address", message: "Alamat tidak boleh kosong" },
-            { key: "latitude", message: "Pilih lokasi di peta" },
-            { key: "longitude", message: "Pilih lokasi di peta" },
+            { key: "latitude", message: "Latitude tidak boleh kosong" },
+            { key: "longitude", message: "Longitude tidak boleh kosong" },
         ];
 
         let hasError = false;
@@ -59,6 +63,18 @@ export default function AdminWorkshopCreate({
         });
 
         return hasError;
+    };
+
+    const onChangedLatitudeLongitudeByInput = () => {
+        if (data.latitude && data.longitude) {
+            getFullAddress(
+                data.latitude,
+                data.longitude,
+                setOnFindingAddress
+            ).then((address) => {
+                if (address) setData("address", address);
+            });
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -165,17 +181,114 @@ export default function AdminWorkshopCreate({
                     </div>
                 </div>
 
+                <div className="mb-5 flex items-center gap-2">
+                    <div className="flex flex-col w-full">
+                        <label className="text-base mb-1">
+                            Koordinat Latitude
+                        </label>
+                        <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="Masukkan Latitude"
+                            value={data.latitude?.toString() ?? ""}
+                            onChange={(e) => {
+                                const value = handleNumericInput(
+                                    e.target.value
+                                );
+                                const parsedValue = parseFloat(value);
+
+                                if (!isNaN(parsedValue)) {
+                                    setData("latitude", parsedValue);
+                                    onChangedLatitudeLongitudeByInput();
+                                }
+                            }}
+                            onPaste={(e) => {
+                                const pastedValue =
+                                    e.clipboardData.getData("text");
+                                const value = handleNumericInput(pastedValue);
+                                const parsedValue = parseFloat(value);
+
+                                if (!isNaN(parsedValue)) {
+                                    setData("latitude", parsedValue);
+                                    onChangedLatitudeLongitudeByInput();
+                                }
+                            }}
+                            className={`py-6 ${
+                                errors.latitude ? "border-red-500" : ""
+                            }`}
+                        />
+                        {errors.latitude && (
+                            <ErrorInput error={errors.latitude} />
+                        )}
+                    </div>
+                    <div className="flex flex-col w-full">
+                        <label className="text-base mb-1">
+                            Koordinat Longitude
+                        </label>
+                        <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="Masukkan Longitude"
+                            value={data.longitude?.toString() ?? ""}
+                            onChange={(e) => {
+                                const value = handleNumericInput(
+                                    e.target.value
+                                );
+                                const parsedValue = parseFloat(value);
+
+                                if (!isNaN(parsedValue)) {
+                                    setData("longitude", parsedValue);
+                                    onChangedLatitudeLongitudeByInput();
+                                }
+                            }}
+                            onPaste={(e) => {
+                                const pastedValue =
+                                    e.clipboardData.getData("text");
+                                const value = handleNumericInput(pastedValue);
+                                const parsedValue = parseFloat(value);
+
+                                if (!isNaN(parsedValue)) {
+                                    setData("longitude", parsedValue);
+                                    onChangedLatitudeLongitudeByInput();
+                                }
+                            }}
+                            className={`py-6 ${
+                                errors.longitude ? "border-red-500" : ""
+                            }`}
+                        />
+                        {errors.longitude && (
+                            <ErrorInput error={errors.longitude} />
+                        )}
+                    </div>
+                </div>
+
                 <div className="mb-5">
                     <div className="flex flex-col">
                         <label className="text-base mb-1">
                             Alamat Lengkap (Gunakan peta untuk memilih lokasi)
                         </label>
-                        <Textarea
-                            className="resize-none"
-                            rows={4}
-                            value={data.address ?? ""}
-                            onChange={(e) => setData("address", e.target.value)}
-                        />
+                        <div className="relative overflow-hidden">
+                            <Textarea
+                                className="resize-none"
+                                rows={4}
+                                disabled={onFindingAddress}
+                                value={data.address ?? ""}
+                                onChange={(e) =>
+                                    setData("address", e.target.value)
+                                }
+                            />
+                            {onFindingAddress && (
+                                <span className="absolute top-0 left-0 flex justify-center items-center w-full h-full text-xs text-gray-500">
+                                    <FiLoader
+                                        className="animate-spin"
+                                        size={28}
+                                    />
+                                    <span className="ml-2">
+                                        Menyesuaikan alamat...
+                                    </span>
+                                </span>
+                            )}
+                        </div>
                         {errors.address && (
                             <ErrorInput error={errors.address} />
                         )}
@@ -190,11 +303,17 @@ export default function AdminWorkshopCreate({
 
                         <MapPicker
                             readonly={false}
+                            latitude={data.latitude ?? undefined}
+                            longitude={data.longitude ?? undefined}
                             onLocationPicked={(lat, lon) => {
-                                setData("latitude", lat.toString());
-                                setData("longitude", lon.toString());
+                                setData("latitude", lat);
+                                setData("longitude", lon);
 
-                                getFullAddress(lat, lon).then((address) => {
+                                getFullAddress(
+                                    lat,
+                                    lon,
+                                    setOnFindingAddress
+                                ).then((address) => {
                                     if (address) setData("address", address);
                                 });
                             }}
