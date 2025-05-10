@@ -3,4 +3,5 @@ export type MenuItem = {
     label: string;
     url: string;
     acceptedRole?: string[] | null | undefined;
+    activeOnUrls?: string[] | null | undefined;
 };

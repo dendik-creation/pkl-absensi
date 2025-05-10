@@ -83,6 +83,7 @@ class DashboardController extends Controller
             'title' => 'Dashboard',
             'supervisor' => $supervisor,
             'data' => [
+                'user_role' => Auth::user()->role,
                 'attendances_daily' => $this->getDailyAttendance($workshops_id),
                 'attendances_month' => $this->getAttedanceChart($workshops_id),
             ],

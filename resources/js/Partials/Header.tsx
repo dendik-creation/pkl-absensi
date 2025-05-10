@@ -3,14 +3,19 @@ import React, { useState } from "react";
 import { FiLoader, FiLogOut } from "react-icons/fi";
 import { Link, useForm } from "@inertiajs/react";
 import { DrawerConfirmAction } from "@/Components/custom/FormElement";
+import { clearLocalStorage } from "@/Services/additionalService";
 
 export default function Header({ title }: { title?: string }) {
     const { post, processing } = useForm();
     const [signoutDrawerOpen, setsignoutDrawerOpen] = useState<boolean>(false);
     const handleLogout = (e: React.FormEvent) => {
         e.preventDefault();
+        clearLocalStorage();
         setsignoutDrawerOpen(false);
-        post("/auth/signout");
+        post("/auth/signout", {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     return (

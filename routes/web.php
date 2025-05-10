@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\StudentController as AdminStudent;
 use App\Http\Controllers\Admin\WorkshopController as AdminWorkshop;
 use App\Http\Controllers\Admin\SupervisorController as AdminSupervisor;
-
+use App\Http\Controllers\Global\GlobalController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Student\AttendanceController as StudentAttendance;
 use App\Http\Controllers\Student\JournalController as StudentJournal;
@@ -30,6 +30,15 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth')->group(function(){
     Route::post('auth/signout', [AuthController::class, 'signOut']);
+
+    // Global Access
+    Route::prefix('/profile')->controller(GlobalController::class)->group(function () {
+        Route::get('/', [GlobalController::class, 'showProfile']);
+        Route::put('/update', [GlobalController::class, 'updateProfile']);
+        Route::get('/change-password', 'showChangePassword');
+        Route::post('/change-password/check', 'checkPassword');
+        Route::put('/change-password', 'updatePassword');
+    });
 
     // Admin Access
     Route::prefix('admin')->group(function () {
