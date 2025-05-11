@@ -3,6 +3,7 @@ import { MainLayout } from "@/Layouts/MainLayout";
 import {
     currentTimeCode,
     currentTimeGreeting,
+    setLocalStorage,
     ymdToIdDate,
 } from "@/Services/additionalService";
 import { PiStudentFill } from "react-icons/pi";
@@ -22,6 +23,11 @@ type SupervisorDashboardProps = {
     title?: string;
     supervisor: Supervisor;
     data: {
+        user_role: string;
+        default_location: {
+            latitude: number;
+            longitude: number;
+        };
         attendances_daily: {
             total_students: number;
             attendances?: Attendance[];
@@ -41,6 +47,9 @@ export default function SupervisorDashboard({
     data,
 }: SupervisorDashboardProps) {
     const [currentTime, setCurrentTime] = useState(new Date().toISOString());
+    setLocalStorage("user_role", data.user_role);
+    setLocalStorage("default_latitude", data.default_location.latitude);
+    setLocalStorage("default_longitude", data.default_location.longitude);
 
     useEffect(() => {
         const interval = setInterval(() => {

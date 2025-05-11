@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Global;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\Supervisor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -97,6 +98,45 @@ class GlobalController extends Controller
         return back()->with('success', 'Profil berhasil diperbarui');
     }
 
+    private function updateSupervisorProfile(Request $request){
+        $validated = $request->validate([
+            'username' => 'required|string|max:255',
+            'email' => 'nullable|string|email|max:255',
+            'full_name' => 'required|string|max:255',
+        ], [
+            'username.required' => 'Nama tidak boleh kosong',
+            'email.email' => 'Format email tidak valid',
+            'full_name.required' => 'Nama lengkap tidak boleh kosong',
+        ]);
+
+        $user = User::findOrFail(Auth::user()->id);
+        if (!$user) {
+            return back()->withErrors([
+                'message' => 'User tidak ditemukan',
+            ]);
+        }
+        $supervisor = Supervisor::where('user_id', $user->id)->first();
+        if (!$supervisor) {
+            return back()->withErrors([
+                'message' => 'Pembimbing tidak ditemukan',
+            ]);
+        }
+        if ($supervisor->nip !== $validated['username'] && Supervisor::where('nip', $validated['username'])->exists()) {
+            return back()->withErrors([
+                'message' => 'NIP sudah digunakan pembimbing lain',
+            ]);
+        }
+        $supervisor->update([
+            'nip' => $validated['username'],
+            'full_name' => $validated['full_name'],
+        ]);
+        $user->update([
+            'username' => $validated['username'],
+            'email' => $validated['email'] ?? $user->email,
+        ]);
+        return back()->with('success', 'Profil berhasil diperbarui');
+    }
+
     public function updateProfile(Request $request)
     {
         $user_role = Auth::user()->role;
@@ -107,9 +147,9 @@ class GlobalController extends Controller
             case "STUDENT" :
                 $this->updateStudentProfile($request);
                 break;
-            // case "SUPERVISOR" :
-            //     $this->updateSupervisorProfile($request);
-            //     break;
+            case "SUPERVISOR" :
+                $this->updateSupervisorProfile($request);
+                break;
             default:
                 return back()->withErrors([
                     'message' => 'Role tidak ditemukan',
