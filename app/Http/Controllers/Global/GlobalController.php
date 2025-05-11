@@ -72,25 +72,23 @@ class GlobalController extends Controller
                 'message' => 'User tidak ditemukan',
             ]);
         }
-        if($user->username !== $validated['username']){
-            $student = Student::where('user_id', $user->id)->first();
-            if (!$student) {
-                return back()->withErrors([
-                    'message' => 'Student tidak ditemukan',
-                ]);
-            }
-            if (Student::where('nis', $validated['username'])->exists()) {
-                return back()->withErrors([
-                    'message' => 'NIS sudah digunakan siswa lain',
-                ]);
-            }
-            $student->update([
-                'nis' => $validated['username'],
-                'full_name' => $validated['full_name'],
-                'class' => $validated['class'],
-                'major' => $validated['major'],
+        $student = Student::where('user_id', $user->id)->first();
+        if (!$student) {
+            return back()->withErrors([
+                'message' => 'Student tidak ditemukan',
             ]);
         }
+        if ( $user->username !== $validated['username'] && Student::where('nis', $validated['username'])->exists()) {
+            return back()->withErrors([
+                'message' => 'NIS sudah digunakan siswa lain',
+            ]);
+        }
+        $student->update([
+            'nis' => $validated['username'],
+            'full_name' => $validated['full_name'],
+            'class' => $validated['class'],
+            'major' => $validated['major'],
+        ]);
         $user->update([
             'username' => $validated['username'],
             'email' => $validated['email'] ?? $user->email,
