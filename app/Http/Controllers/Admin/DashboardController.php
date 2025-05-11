@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\GlobalSetting;
 use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\User;
@@ -82,5 +83,60 @@ class DashboardController extends Controller
                 ],
             ]
         ]);
+    }
+
+    public function appSetting(){
+        $app_setting = GlobalSetting::first();
+        return Inertia::render('Admin/AppSetting', [
+            'title' => 'Pengaturan Aplikasi',
+            'app_setting' => $app_setting,
+            'base_url' => config('app.url'),
+        ]);
+    }
+
+    public function updateAppSetting(Request $request)
+    {
+        $validated = $request->validate([
+            'app_name' => 'required|string|max:255',
+            'app_icon' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'default_latitude' => 'required|numeric',
+            'default_longitude' => 'required|numeric',
+            'max_attendance_radius' => 'required|numeric',
+            'check_in_start' => 'required|string',
+            'check_in_end' => 'required|string',
+            'check_out_start' => 'required|string',
+            'check_out_end' => 'required|string',
+        ], [
+            'app_name.required' => 'Nama aplikasi tidak boleh kosong',
+            'app_icon.image' => 'Ikon aplikasi harus berupa gambar',
+            'app_icon.mimes' => 'Ikon aplikasi harus berupa file JPEG, PNG, JPG, atau GIF',
+            'app_icon.max' => 'Ukuran ikon aplikasi tidak boleh lebih dari 2MB',
+            'default_latitude.required' => 'Latitude tidak boleh kosong',
+            'default_longitude.required' => 'Longitude tidak boleh kosong',
+            'max_attendance_radius.required' => 'Radius kehadiran tidak boleh kosong',
+            'check_in_start.required' => 'Waktu mulai absensi masuk tidak boleh kosong',
+            'check_in_end.required' => 'Waktu akhir absensi masuk tidak boleh kosong',
+            'check_out_start.required' => 'Waktu mulai absensi pulang tidak boleh kosong',
+            'check_out_end.required' => 'Waktu akhir absensi pulang tidak boleh kosong',
+        ]);
+
+        $app_setting = GlobalSetting::first();
+        $app_setting->update([
+            'app_name' => $validated['app_name'],
+            'default_latitude' => $validated['default_latitude'],
+            'default_longitude' => $validated['default_longitude'],
+            'max_attendance_radius' => $validated['max_attendance_radius'],
+            'check_in_start' => $validated['check_in_start'],
+            'check_in_end' => $validated['check_in_end'],
+            'check_out_start' => $validated['check_out_start'],
+            'check_out_end' => $validated['check_out_end'],
+        ]);
+        if ($request->hasFile('app_icon') && $request->file('app_icon')->isValid()) {
+            $file = $request->file('app_icon');
+            $filename = 'favicon.png';
+            $file->move(public_path('/assets/img'), $filename);
+            $app_setting->update(['app_icon' => "/assets/img/$filename"]);
+        }
+        return back()->with('success', 'Pengaturan aplikasi berhasil diperbarui');
     }
 }

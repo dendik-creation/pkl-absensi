@@ -41,8 +41,6 @@ const MapPicker = ({
 
     useEffect(() => {
         if (latitude !== undefined && longitude !== undefined) {
-            console.log("latitude", latitude);
-            console.log("longitude", longitude);
             setPosition({ lat: latitude, lng: longitude });
         }
     }, [latitude, longitude]);

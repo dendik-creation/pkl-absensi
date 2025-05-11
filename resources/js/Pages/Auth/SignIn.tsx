@@ -1,13 +1,19 @@
 import { useForm } from "@inertiajs/react";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
 import { FiKey, FiLoader, FiLogIn, FiUser } from "react-icons/fi";
 import { ErrorInput } from "@/Components/custom/FormElement";
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import { Toaster } from "sonner";
 
-export default function SignIn() {
+export default function SignIn({ app_name }: { app_name: string }) {
     const { data, setData, post, processing, errors, setError } = useForm({
         username: "",
         password: "",
@@ -38,11 +44,14 @@ export default function SignIn() {
                     <img
                         src="/assets/img/favicon.png"
                         alt="Icon Image"
-                        className="mx-auto bg-cover h-32"
+                        className="mx-auto bg-cover h-32 scale-75"
                     />
                     <CardTitle className="text-center text-xl">
-                        Masuk ke Akun Anda
+                        {app_name}
                     </CardTitle>
+                    <CardDescription className="text-center">
+                        Selamat datang dan masuk ke akun Anda
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">

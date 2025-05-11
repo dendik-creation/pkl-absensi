@@ -20,10 +20,9 @@ use App\Http\Controllers\Supervisor\StudentController as SupervisorStudent;
 use App\Http\Controllers\Supervisor\WorkshopController as SupervisorWorkshop;
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
+
 Route::prefix('auth')->group(function () {
-    Route::get('/signin', function () {
-        return Inertia::render('Auth/SignIn');
-    })->name('auth.signin')->middleware('guest');
+    Route::get('/signin', [AuthController::class, 'signInView'])->name('auth.signin')->middleware('guest');
 
     Route::post('/signin', [AuthController::class, 'signIn'])->middleware('guest');
 });
@@ -31,7 +30,7 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth')->group(function(){
     Route::post('auth/signout', [AuthController::class, 'signOut']);
 
-    // Global Access
+    // Global Profile Access
     Route::prefix('/profile')->controller(GlobalController::class)->group(function () {
         Route::get('/', [GlobalController::class, 'showProfile']);
         Route::put('/update', [GlobalController::class, 'updateProfile']);
@@ -43,6 +42,8 @@ Route::middleware('auth')->group(function(){
     // Admin Access
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index']);
+        Route::get('/app-setting', [AdminDashboard::class, 'appSetting']);
+        Route::post('/app-setting/update', [AdminDashboard::class, 'updateAppSetting']);
 
         Route::prefix('/student')->controller(AdminStudent::class)->group(function () {
             Route::get('/', 'index');

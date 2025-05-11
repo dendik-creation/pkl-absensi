@@ -24,10 +24,10 @@ export default function Header({ title }: { title?: string }) {
                 <img
                     src="/assets/img/favicon.png"
                     alt="Header Image"
-                    className="h-16"
+                    className="h-16 scale-50"
                 />
             </Link>
-            <h4 className="font-semibold">{title}</h4>
+            <h4 className="font-medium text-base">{title}</h4>
             <div>
                 <Button
                     variant={"link"}

@@ -1,29 +1,30 @@
 import { getLocalStorage } from "@/Services/additionalService";
 import { MenuItem } from "../Types/menu";
 import { Link } from "@inertiajs/react";
-import { FaHome, FaUser, FaCog } from "react-icons/fa";
+import { FaUser, FaCog } from "react-icons/fa";
+import { LayoutDashboard } from "lucide-react";
 
 export default function NavbarFooter() {
     const pathame = window.location.pathname;
     const currentRole = getLocalStorage("user_role") as string;
     const menuItems: MenuItem[] = [
         {
-            icon: <FaHome size={24} />,
-            label: "Home",
+            icon: <LayoutDashboard size={24} />,
+            label: "Dashboard",
             url: `/${currentRole?.toLowerCase()}/dashboard`,
             acceptedRole: ["ADMIN", "STUDENT", "SUPERVISOR"],
         },
         {
             icon: <FaUser size={24} />,
-            label: "Profile",
+            label: "Profil",
             url: "/profile",
             activeOnUrls: ["/profile", "/profile/change-password"],
             acceptedRole: ["ADMIN", "STUDENT", "SUPERVISOR"],
         },
         {
             icon: <FaCog size={24} />,
-            label: "Settings",
-            url: "#",
+            label: "Pengaturan",
+            url: "/admin/app-setting",
             acceptedRole: ["ADMIN"],
         },
     ];
@@ -52,7 +53,7 @@ export default function NavbarFooter() {
                         }`}
                     >
                         {item.icon}
-                        <span className="text-xs">{item.label}</span>
+                        <span className="text-xs mt-1">{item.label}</span>
                     </Link>
                 );
             })}
