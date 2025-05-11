@@ -24,6 +24,10 @@ type AdminDashboardProps = {
     title?: string;
     data: {
         user_role: string;
+        default_location: {
+            latitude: number;
+            longitude: number;
+        };
         cards: {
             student_count: number;
             workshop_count: number;
@@ -47,6 +51,8 @@ export default function AdminDashboard({ title, data }: AdminDashboardProps) {
     const [currentTime, setCurrentTime] = useState(new Date().toISOString());
 
     setLocalStorage("user_role", data.user_role);
+    setLocalStorage("default_latitude", data.default_location.latitude);
+    setLocalStorage("default_longitude", data.default_location.longitude);
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTime(new Date().toISOString());

@@ -66,10 +66,15 @@ class DashboardController extends Controller
 
     public function index()
     {
+        $app = GlobalSetting::first();
         return Inertia::render('Admin/Dashboard', [
             'title' => 'Dashboard Admin',
             'data' => [
                 'user_role' => Auth::user()->role,
+                'default_location' => [
+                    'latitude' => $app->default_latitude,
+                    'longitude' => $app->default_longitude,
+                ],
                 'cards' => [
                     'student_count' => Student::count(),
                     'supervisor_count' => Supervisor::count(),

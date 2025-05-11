@@ -2,7 +2,7 @@
 
 import { useForm } from "@inertiajs/react";
 import { FiLoader, FiSave } from "react-icons/fi";
-import React from "react";
+import React, { useEffect } from "react";
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import { ErrorInput, SelectSearchInput } from "@/Components/custom/FormElement";
 import { Button } from "@/Components/ui/button";
@@ -15,7 +15,9 @@ import { Textarea } from "@/Components/ui/textarea";
 import {
     getFullAddress,
     handleNumericInput,
+    inputDebounce,
 } from "@/Services/additionalService";
+import axios from "axios";
 
 type AdminWorkshopCreateProps = {
     title?: string;
@@ -65,7 +67,29 @@ export default function AdminWorkshopCreate({
         return hasError;
     };
 
-    const onChangedLatitudeLongitudeByInput = () => {
+    const debounceRevereseLocation = inputDebounce(async (url: string) => {
+        try {
+            setOnFindingAddress(true);
+            const response = await axios(`/api/reverse-gmaps-url?url=${url}`);
+            const { latitude, longitude } = response.data;
+            setData("latitude", latitude);
+            setData("longitude", longitude);
+        } catch (error: any) {
+            setOnFindingAddress(false);
+            BlastSonner({
+                message: error?.response?.data.error,
+                type: BlastType.ERROR,
+            });
+        } finally {
+            setOnFindingAddress(false);
+        }
+    });
+
+    useEffect(() => {
+        onChangedLatitudeLongitudeByInput();
+    }, [data.latitude, data.longitude]);
+
+    const onChangedLatitudeLongitudeByInput = inputDebounce(() => {
         if (data.latitude && data.longitude) {
             getFullAddress(
                 data.latitude,
@@ -75,7 +99,7 @@ export default function AdminWorkshopCreate({
                 if (address) setData("address", address);
             });
         }
-    };
+    });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -181,6 +205,26 @@ export default function AdminWorkshopCreate({
                     </div>
                 </div>
 
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">
+                            Lokasi Default (Untuk Preview Map)
+                        </label>
+                        <Input
+                            type="url"
+                            placeholder="Masukkan URL Pendek Google Maps"
+                            onChange={(e) =>
+                                debounceRevereseLocation(e.target.value)
+                            }
+                            className={`py-6 mb-3 ${
+                                errors.latitude || errors.longitude
+                                    ? "border-red-500"
+                                    : ""
+                            }`}
+                        />
+                    </div>
+                </div>
+
                 <div className="mb-5 flex items-center gap-2">
                     <div className="flex flex-col w-full">
                         <label className="text-base mb-1">
@@ -189,8 +233,13 @@ export default function AdminWorkshopCreate({
                         <Input
                             type="text"
                             inputMode="numeric"
+                            disabled={onFindingAddress}
                             placeholder="Masukkan Latitude"
-                            value={data.latitude?.toString() ?? ""}
+                            value={
+                                onFindingAddress
+                                    ? "Menyesuaikan latitude"
+                                    : data.latitude?.toString() ?? ""
+                            }
                             onChange={(e) => {
                                 const value = handleNumericInput(
                                     e.target.value
@@ -229,7 +278,12 @@ export default function AdminWorkshopCreate({
                             type="text"
                             inputMode="numeric"
                             placeholder="Masukkan Longitude"
-                            value={data.longitude?.toString() ?? ""}
+                            disabled={onFindingAddress}
+                            value={
+                                onFindingAddress
+                                    ? "Menyesuaikan longitude"
+                                    : data.longitude?.toString() ?? ""
+                            }
                             onChange={(e) => {
                                 const value = handleNumericInput(
                                     e.target.value
@@ -264,9 +318,7 @@ export default function AdminWorkshopCreate({
 
                 <div className="mb-5">
                     <div className="flex flex-col">
-                        <label className="text-base mb-1">
-                            Alamat Lengkap (Gunakan peta untuk memilih lokasi)
-                        </label>
+                        <label className="text-base mb-1">Alamat Lengkap</label>
                         <div className="relative overflow-hidden">
                             <Textarea
                                 className="resize-none"
@@ -301,23 +353,38 @@ export default function AdminWorkshopCreate({
                             Koordinat Alamat DuDi
                         </label>
 
-                        <MapPicker
-                            readonly={false}
-                            latitude={data.latitude ?? undefined}
-                            longitude={data.longitude ?? undefined}
-                            onLocationPicked={(lat, lon) => {
-                                setData("latitude", lat);
-                                setData("longitude", lon);
+                        <div className="relative overflow-hidden">
+                            {onFindingAddress && (
+                                <div className="absolute z-[10] rounded-lg h-full w-full bg-slate-50/50 rounded-white">
+                                    <div className="flex flex-col gap-3 items-center justify-center h-full">
+                                        <FiLoader
+                                            className="animate-spin"
+                                            size={64}
+                                        />
+                                        <h3>Menyesuaikan koordinat</h3>
+                                    </div>
+                                </div>
+                            )}
 
-                                getFullAddress(
-                                    lat,
-                                    lon,
-                                    setOnFindingAddress
-                                ).then((address) => {
-                                    if (address) setData("address", address);
-                                });
-                            }}
-                        />
+                            <MapPicker
+                                readonly={false}
+                                latitude={data.latitude ?? undefined}
+                                longitude={data.longitude ?? undefined}
+                                onLocationPicked={(lat, lon) => {
+                                    setData("latitude", lat);
+                                    setData("longitude", lon);
+
+                                    getFullAddress(
+                                        lat,
+                                        lon,
+                                        setOnFindingAddress
+                                    ).then((address) => {
+                                        if (address)
+                                            setData("address", address);
+                                    });
+                                }}
+                            />
+                        </div>
 
                         {errors.latitude && errors.longitude && (
                             <ErrorInput error="Tentukan koordinat DuDi" />
@@ -328,7 +395,7 @@ export default function AdminWorkshopCreate({
                 <Button
                     type="submit"
                     className="w-full mt-4 p-6 bg-green-500 hover:bg-green-600"
-                    disabled={processing}
+                    disabled={processing || onFindingAddress}
                 >
                     {processing ? (
                         <FiLoader className="animate-spin" />
