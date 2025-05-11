@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Global;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class GlobalController extends Controller
         if (!$auth_id) {
             return redirect('/');
         }
-        $user = User::with(['student', 'supervisor'])->findOrFail($auth_id);
+        $user = User::with(['student.workshop', 'supervisor.workshops'])->findOrFail($auth_id);
         return inertia('Global/Profile', [
             'title' => 'Profil Anda',
             'user' => $user,
@@ -49,6 +50,53 @@ class GlobalController extends Controller
         return back()->with('success', 'Profil berhasil diperbarui');
     }
 
+    private function updateStudentProfile(Request $request){
+        $validated = $request->validate([
+            'username' => 'required|string|max:255',
+            'full_name' => 'required|string|max:255',
+            'email' => 'nullable|string|email|max:255',
+            'class' => 'required|string|max:255',
+            'major' => 'required|string|max:255',
+        ], [
+            'username.required' => 'Nama tidak boleh kosong',
+            'full_name.required' => 'Nama lengkap tidak boleh kosong',
+            'email.email' => 'Format email tidak valid',
+            'class.required' => 'Kelas tidak boleh kosong',
+            'major.required' => 'Jurusan tidak boleh kosong',
+        ]);
+
+        $user = User::findOrFail(Auth::user()->id);
+        if (!$user) {
+            return back()->withErrors([
+                'message' => 'User tidak ditemukan',
+            ]);
+        }
+        if($user->username !== $validated['username']){
+            $student = Student::where('user_id', $user->id)->first();
+            if (!$student) {
+                return back()->withErrors([
+                    'message' => 'Student tidak ditemukan',
+                ]);
+            }
+            if (Student::where('nis', $validated['username'])->exists()) {
+                return back()->withErrors([
+                    'message' => 'NIS sudah digunakan siswa lain',
+                ]);
+            }
+            $student->update([
+                'nis' => $validated['username'],
+                'full_name' => $validated['full_name'],
+                'class' => $validated['class'],
+                'major' => $validated['major'],
+            ]);
+        }
+        $user->update([
+            'username' => $validated['username'],
+            'email' => $validated['email'] ?? $user->email,
+        ]);
+        return back()->with('success', 'Profil berhasil diperbarui');
+    }
+
     public function updateProfile(Request $request)
     {
         $user_role = Auth::user()->role;
@@ -56,9 +104,9 @@ class GlobalController extends Controller
             case 'ADMIN':
                 $this->updateAdminProfile($request);
                 break;
-            // case "STUDENT" :
-            //     $this->updateStudentProfile($request);
-            //     break;
+            case "STUDENT" :
+                $this->updateStudentProfile($request);
+                break;
             // case "SUPERVISOR" :
             //     $this->updateSupervisorProfile($request);
             //     break;

@@ -166,6 +166,212 @@ export default function GlobalProfile({
             </form>
         );
     };
+    const ProfileStudentForm = () => {
+        const [editMode, setEditMode] = useState<boolean>(false);
+        const studentForm = useForm({
+            username: user.username,
+            email: user.email,
+            full_name: user.student?.full_name,
+            class: user.student?.class,
+            major: user.student?.major,
+        });
+        const handleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            studentForm.put("/profile/update", {
+                preserveState: true,
+                replace: true,
+                onError: (errors) => {
+                    setEditMode(true);
+                    return BlastSonner({
+                        message: errors.message,
+                        type: BlastType.ERROR,
+                    });
+                },
+                onSuccess: (page: any) => {
+                    setEditMode(false);
+                    if (page.props.flash && page.props.flash?.success) {
+                        return BlastSonner({
+                            message:
+                                page.props.flash?.success ?? ("" as string),
+                            type: BlastType.SUCCESS,
+                        });
+                    }
+                },
+            });
+        };
+        return (
+            <form onSubmit={handleSubmit}>
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">NIS (Username)</label>
+                        <Input
+                            type="text"
+                            placeholder="Masukkan NIS"
+                            value={studentForm.data.username}
+                            disabled={!editMode}
+                            onChange={(e) =>
+                                studentForm.setData("username", e.target.value)
+                            }
+                            className={`py-6 ${
+                                studentForm.errors.username
+                                    ? "border-red-500"
+                                    : ""
+                            }`}
+                        />
+                        {studentForm.errors.username && (
+                            <ErrorInput error={studentForm.errors.username} />
+                        )}
+                    </div>
+                </div>
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">Nama Lengkap</label>
+                        <Input
+                            type="text"
+                            placeholder="Masukkan Nama Lengkap"
+                            value={studentForm.data.full_name}
+                            disabled={!editMode}
+                            onChange={(e) =>
+                                studentForm.setData("full_name", e.target.value)
+                            }
+                            className={`py-6 ${
+                                studentForm.errors.full_name
+                                    ? "border-red-500"
+                                    : ""
+                            }`}
+                        />
+                        {studentForm.errors.full_name && (
+                            <ErrorInput error={studentForm.errors.full_name} />
+                        )}
+                    </div>
+                </div>
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">
+                            Email (Opsional)
+                        </label>
+                        <Input
+                            type="text"
+                            placeholder="Masukkan Email"
+                            disabled={!editMode}
+                            value={studentForm.data.email ?? ""}
+                            onChange={(e) =>
+                                studentForm.setData("email", e.target.value)
+                            }
+                            className={`py-6 ${
+                                studentForm.errors.email ? "border-red-500" : ""
+                            }`}
+                        />
+                    </div>
+                </div>
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">Kelas</label>
+                        <Input
+                            type="text"
+                            placeholder="Masukkan Kelas"
+                            disabled={!editMode}
+                            value={studentForm.data.class ?? ""}
+                            onChange={(e) =>
+                                studentForm.setData("class", e.target.value)
+                            }
+                            className={`py-6 ${
+                                studentForm.errors.class ? "border-red-500" : ""
+                            }`}
+                        />
+                    </div>
+                </div>
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">Jurusan</label>
+                        <Input
+                            type="text"
+                            placeholder="Masukkan Jurusan"
+                            disabled={!editMode}
+                            value={studentForm.data.major ?? ""}
+                            onChange={(e) =>
+                                studentForm.setData("major", e.target.value)
+                            }
+                            className={`py-6 ${
+                                studentForm.errors.major ? "border-red-500" : ""
+                            }`}
+                        />
+                    </div>
+                </div>
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">Tempat DuDi</label>
+                        <Input
+                            type="text"
+                            disabled={true}
+                            value={user.student?.workshop?.name ?? ""}
+                            className={`py-6 ${
+                                studentForm.errors.major ? "border-red-500" : ""
+                            }`}
+                        />
+                    </div>
+                </div>
+                {editMode ? (
+                    <div className="grid grid-cols-3 gap-2 w-full">
+                        <Button
+                            type="button"
+                            onClick={() => {
+                                setEditMode(false);
+                                studentForm.setData("email", user?.email);
+                                studentForm.setData("username", user?.username);
+                            }}
+                            className="w-full mt-4 p-6 bg-red-500 hover:bg-red-600"
+                        >
+                            <span className="flex items-center gap-2">
+                                <Ban />
+                                <span>Batalkan</span>
+                            </span>
+                        </Button>
+                        <Button
+                            type="submit"
+                            className="w-full mt-4 p-6 col-span-2 bg-blue-500 hover:bg-blue-600"
+                            disabled={studentForm.processing}
+                        >
+                            {studentForm.processing ? (
+                                <FiLoader className="animate-spin" />
+                            ) : (
+                                <span className="flex items-center gap-2">
+                                    <FiSave />
+                                    <span>Simpan</span>
+                                </span>
+                            )}
+                        </Button>
+                    </div>
+                ) : (
+                    <>
+                        <Button
+                            type="button"
+                            className="w-full mt-4 p-6 bg-blue-200 hover:bg-blue-300"
+                            disabled={editMode}
+                            onClick={() => setEditMode(true)}
+                        >
+                            <span className="flex items-center gap-2 text-blue-900">
+                                <Pencil />
+                                <span>Edit </span>
+                            </span>
+                        </Button>
+                        <Link href={"/profile/change-password"}>
+                            <Button
+                                type="button"
+                                className="w-full mt-4 p-6 bg-yellow-200 hover:bg-yellow-300"
+                                disabled={editMode}
+                            >
+                                <span className="flex items-center gap-2 text-blue-900">
+                                    <FiKey />
+                                    <span>Ubah Password </span>
+                                </span>
+                            </Button>
+                        </Link>
+                    </>
+                )}
+            </form>
+        );
+    };
     return (
         <MainLayout title={title as string}>
             <PageTitle
@@ -173,6 +379,7 @@ export default function GlobalProfile({
                 description="Anda dapat merubah data diri anda disini"
             />
             {currentRole === "ADMIN" ? <ProfileAdminForm /> : null}
+            {currentRole === "STUDENT" ? <ProfileStudentForm /> : null}
         </MainLayout>
     );
 }

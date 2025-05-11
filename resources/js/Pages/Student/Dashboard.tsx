@@ -6,6 +6,7 @@ import {
     currentTimeGreeting,
     distanceConverter,
     isWithinTimeRange,
+    setLocalStorage,
     ymdToIdDate,
 } from "@/Services/additionalService";
 import { MenuItem } from "@/Types/menu";
@@ -31,6 +32,7 @@ import { Journal } from "@/Types/journal";
 type StudentDashboardProps = {
     title?: string;
     student: Student;
+    user_role: string;
     latest_activity: {
         attendance?: Attendance;
         journal?: Journal;
@@ -41,6 +43,7 @@ type StudentDashboardProps = {
 export default function StudentDashboard({
     title,
     student,
+    user_role,
     latest_activity,
     setting,
 }: StudentDashboardProps) {
@@ -58,6 +61,9 @@ export default function StudentDashboard({
         });
     }
     const [currentTime, setCurrentTime] = useState(new Date().toISOString());
+    setLocalStorage("user_role", user_role);
+    setLocalStorage("default_latitude", setting?.default_latitude);
+    setLocalStorage("default_longitude", setting?.default_longitude);
 
     useEffect(() => {
         const interval = setInterval(() => {
