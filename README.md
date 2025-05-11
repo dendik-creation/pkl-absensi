@@ -11,12 +11,15 @@ This project is developed by [@dendik-creation](https://github.com/dendik-creati
 ### Backend
 
 -   Laravel 11
+-   Inertia Server
+-   FCM (Activate by user decision)
 
 ### Frontend & Tools
 
--   Inertia.js with React and TypeScript
+-   Inertia React TSX
 -   ShadCN UI
--   React-Leaflet
+-   React-Leaflet (Map)
+-   Filepond
 -   TailwindCSS 4
 
 ## Installation
