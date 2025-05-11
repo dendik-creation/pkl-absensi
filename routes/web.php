@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\StudentController as AdminStudent;
 use App\Http\Controllers\Admin\WorkshopController as AdminWorkshop;
 use App\Http\Controllers\Admin\SupervisorController as AdminSupervisor;
-
+use App\Http\Controllers\Global\GlobalController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Student\AttendanceController as StudentAttendance;
 use App\Http\Controllers\Student\JournalController as StudentJournal;
@@ -20,10 +20,9 @@ use App\Http\Controllers\Supervisor\StudentController as SupervisorStudent;
 use App\Http\Controllers\Supervisor\WorkshopController as SupervisorWorkshop;
 
 Route::get('/', [AuthController::class, 'SignedInStatus'])->name('login');
+
 Route::prefix('auth')->group(function () {
-    Route::get('/signin', function () {
-        return Inertia::render('Auth/SignIn');
-    })->name('auth.signin')->middleware('guest');
+    Route::get('/signin', [AuthController::class, 'signInView'])->name('auth.signin')->middleware('guest');
 
     Route::post('/signin', [AuthController::class, 'signIn'])->middleware('guest');
 });
@@ -31,9 +30,20 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth')->group(function(){
     Route::post('auth/signout', [AuthController::class, 'signOut']);
 
+    // Global Profile Access
+    Route::prefix('/profile')->controller(GlobalController::class)->group(function () {
+        Route::get('/', [GlobalController::class, 'showProfile']);
+        Route::put('/update', [GlobalController::class, 'updateProfile']);
+        Route::get('/change-password', 'showChangePassword');
+        Route::post('/change-password/check', 'checkPassword');
+        Route::put('/change-password', 'updatePassword');
+    });
+
     // Admin Access
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index']);
+        Route::get('/app-setting', [AdminDashboard::class, 'appSetting']);
+        Route::post('/app-setting/update', [AdminDashboard::class, 'updateAppSetting']);
 
         Route::prefix('/student')->controller(AdminStudent::class)->group(function () {
             Route::get('/', 'index');
@@ -41,6 +51,7 @@ Route::middleware('auth')->group(function(){
             Route::get('/{id}', 'show');
             Route::get('/{id}/edit', 'edit');
             Route::post('/', 'store');
+            Route::post('/import', 'import');
             Route::put('/{id}', 'update');
             Route::delete('/{id}', 'destroy');
         });
@@ -51,6 +62,7 @@ Route::middleware('auth')->group(function(){
             Route::get('/{id}', 'show');
             Route::get('/{id}/edit', 'edit');
             Route::post('/', 'store');
+            Route::post('/import', 'import');
             Route::put('/{id}', 'update');
             Route::delete('/{id}', 'destroy');
         });
@@ -61,6 +73,7 @@ Route::middleware('auth')->group(function(){
             Route::get('/{id}', 'show');
             Route::get('/{id}/edit', 'edit');
             Route::post('/', 'store');
+            Route::post('/import', 'import');
             Route::put('/{id}', 'update');
             Route::delete('/{id}', 'destroy');
         });

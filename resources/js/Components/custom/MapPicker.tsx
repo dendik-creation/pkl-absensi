@@ -10,6 +10,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { getLocalStorage } from "@/Services/additionalService";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -45,6 +46,11 @@ const MapPicker = ({
         }
     }, [latitude, longitude]);
 
+    const defaultPosition = {
+        lat: getLocalStorage("default_latitude"),
+        lng: getLocalStorage("default_longitude"),
+    };
+
     const LocationMarker = () => {
         useMapEvents({
             click(e: any) {
@@ -75,7 +81,7 @@ const MapPicker = ({
 
     return (
         <MapContainer
-            center={position || { lat: -6.804443, lng: 110.838333 }}
+            center={position || defaultPosition || [0, 0]}
             zoom={15}
             scrollWheelZoom={true}
             style={{

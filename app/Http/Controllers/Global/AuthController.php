@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Global;
 
 use App\Http\Controllers\Controller;
+use App\Models\GlobalSetting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,13 @@ class AuthController extends Controller
         if($role == 'ADMIN') return Inertia::location('/admin/dashboard');
         if($role == 'STUDENT') return Inertia::location('/student/dashboard');
         if($role == 'SUPERVISOR') return Inertia::location('/supervisor/dashboard');
+    }
+
+    public function signInView(){
+        $app_setting = GlobalSetting::first();
+        return Inertia::render('Auth/SignIn', [
+            'app_name' => $app_setting->app_name,
+        ]);
     }
 
     public function signIn(Request $request){

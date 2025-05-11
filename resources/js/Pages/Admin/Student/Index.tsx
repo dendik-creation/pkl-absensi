@@ -1,4 +1,4 @@
-import { SearchInput } from "@/Components/custom/FormElement";
+import { ImportFileDrawer, SearchInput } from "@/Components/custom/FormElement";
 import NotFoundInList from "@/Components/custom/NotFoundInList";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
@@ -6,9 +6,9 @@ import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
 import { inputDebounce } from "@/Services/additionalService";
 import { Student } from "@/Types/student";
-import { Link, router } from "@inertiajs/react";
-import { ChevronRight, PlusCircle } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { Link, router, useForm } from "@inertiajs/react";
+import { ArrowUpFromLine, ChevronRight, PlusCircle } from "lucide-react";
+import { ChangeEvent, useState } from "react";
 import { usePage } from "@inertiajs/react";
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 
@@ -24,6 +24,39 @@ export default function AdminStudentIndex({
     const { flash } = usePage().props as any;
     const [studentsData, setStudentsData] = useState<Student[]>(students);
     const [searchValue, setSearchValue] = useState<string>("");
+
+    const [importDrawerOpen, setImportDrawerOpen] = useState<boolean>(false);
+    const [onImport, setOnImport] = useState<boolean>(false);
+
+    const { data, post, setData } = useForm({
+        file_excel: null as File | null,
+    });
+    const handleImport = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!data.file_excel) return;
+
+        setOnImport(true);
+
+        post(`/admin/student/import`, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+            preserveScroll: true,
+            replace: true,
+            onError: (error: any) => {
+                setOnImport(false);
+                BlastSonner({
+                    type: BlastType.ERROR,
+                    message: error.message,
+                });
+            },
+            onFinish: () => {
+                setOnImport(false);
+                setImportDrawerOpen(false);
+                setData("file_excel", null);
+            },
+        });
+    };
 
     if (flash.success) {
         BlastSonner({
@@ -70,12 +103,36 @@ export default function AdminStudentIndex({
                 <Button
                     size={"lg"}
                     variant="outline"
-                    className="w-full bg-green-200 border mb-5 hover:bg-green-300 flex justify-center items-center gap-2"
+                    className="w-full bg-green-200 border mb-3 hover:bg-green-300 flex justify-center items-center gap-2"
                 >
                     <PlusCircle size={20} />
                     <span>Tambah Siswa</span>
                 </Button>
             </Link>
+            <div className="w-full">
+                <Button
+                    size={"lg"}
+                    onClick={() => setImportDrawerOpen(true)}
+                    variant="outline"
+                    className="w-full bg-blue-200 border mb-5 hover:bg-blue-300 flex justify-center items-center gap-2"
+                >
+                    <ArrowUpFromLine size={20} />
+                    <span>Import Data Siswa</span>
+                </Button>
+                <ImportFileDrawer
+                    title="Import Data Siswa"
+                    description="Import data siswa dari file excel"
+                    file={data.file_excel}
+                    onFileChange={(file: File | null) =>
+                        setData("file_excel", file)
+                    }
+                    submitting={onImport}
+                    onSubmit={handleImport}
+                    isOpen={importDrawerOpen}
+                    templatePath="assets/files/template/import-siswa-pkl.xlsx"
+                    onClose={() => setImportDrawerOpen(false)}
+                />
+            </div>
 
             <div className="grid grid-cols-1">
                 {studentsData.length > 0 ? (

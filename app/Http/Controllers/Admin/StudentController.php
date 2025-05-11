@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\StudentImport;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Workshop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
@@ -18,18 +20,18 @@ class StudentController extends Controller
 
         $students = Student::with('user', 'workshop')
             ->when($search, function ($query, $search) {
-                $query->where('full_name', 'like', "%{$search}%")
-                      ->orWhere('nis', 'like', "%{$search}%");
+                $query->where('full_name', 'like', "%{$search}%")->orWhere('nis', 'like', "%{$search}%");
             })
             ->paginate(20);
 
         return Inertia::render('Admin/Student/Index', [
-            'title' => "Data Siswa",
+            'title' => 'Data Siswa',
             'students' => $students->items(),
         ]);
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $student = Student::with('user', 'workshop.supervisor')->findOrFail($id);
         $currentDate = now()->format('Y-m-d');
         $latest_activity = [
@@ -38,7 +40,7 @@ class StudentController extends Controller
         ];
 
         return Inertia::render('Admin/Student/Show', [
-            'title' => "Informasi Siswa",
+            'title' => 'Informasi Siswa',
             'student' => $student,
             'latest_activity' => $latest_activity,
         ]);
@@ -49,12 +51,12 @@ class StudentController extends Controller
         $student = Student::with('user', 'workshop')->findOrFail($id);
         $workshops = Workshop::all()->map(function ($workshop) {
             return [
-                'value' => "" . $workshop->id . "",
+                'value' => '' . $workshop->id . '',
                 'label' => $workshop->name,
             ];
         });
         return Inertia::render('Admin/Student/Edit', [
-            'title' => "Edit Siswa",
+            'title' => 'Edit Siswa',
             'student' => $student,
             'workshops' => $workshops,
         ]);
@@ -64,12 +66,12 @@ class StudentController extends Controller
     {
         $workshops = Workshop::all()->map(function ($workshop) {
             return [
-                'value' => "" . $workshop->id . "",
+                'value' => '' . $workshop->id . '',
                 'label' => $workshop->name,
             ];
         });
         return Inertia::render('Admin/Student/Create', [
-            'title' => "Tambah Siswa",
+            'title' => 'Tambah Siswa',
             'workshops' => $workshops,
         ]);
     }
@@ -87,17 +89,19 @@ class StudentController extends Controller
         $existingStudent = Student::where('nis', $validated['nis'])->first();
         if ($existingStudent) {
             return back()->withErrors([
-                'message' => 'NIS telah digunakan siswa lain'
+                'message' => 'NIS telah digunakan siswa lain',
             ]);
         }
         $user = User::create([
             'username' => $validated['nis'],
             'password' => bcrypt(config('app.default_password')),
-            'role' => User::STUDENT_ROLE
+            'role' => User::STUDENT_ROLE,
         ]);
-        $student = Student::create(array_merge($validated, [
-            'user_id' => $user->id,
-        ]));
+        $student = Student::create(
+            array_merge($validated, [
+                'user_id' => $user->id,
+            ]),
+        );
 
         Session::flash('success', 'Siswa baru berhasil ditambahkan');
         return Inertia::location('/admin/student');
@@ -117,7 +121,7 @@ class StudentController extends Controller
         $existingStudent = Student::where('nis', $validated['nis'])->where('id', '<>', $student->id)->first();
         if ($existingStudent) {
             return back()->withErrors([
-            'message' => 'NIS telah digunakan siswa lain'
+                'message' => 'NIS telah digunakan siswa lain',
             ]);
         }
 
@@ -130,6 +134,27 @@ class StudentController extends Controller
         $student->update($validated);
 
         Session::flash('success', 'Siswa berhasil diperbarui');
+        return Inertia::location('/admin/student');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            $request->validate([
+                'file_excel' => 'required|mimes:xlsx|max:2048|file',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors([
+                'message' => 'File yang diunggah tidak valid. Pastikan format dan ukuran file sesuai.',
+            ]);
+        }
+
+        $file = $request->file('file_excel');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs('private/import/students', $fileName);
+
+        Excel::import(new StudentImport(), $filePath);
+        Session::flash('success', 'File berhasil diunggah dan disimpan.');
         return Inertia::location('/admin/student');
     }
 
