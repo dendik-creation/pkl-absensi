@@ -16,6 +16,7 @@ import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import { inputDebounce } from "@/Services/additionalService";
 import { FiLoader, FiSave } from "react-icons/fi";
 import { Button } from "@/Components/ui/button";
+import { Textarea } from "@/Components/ui/textarea";
 
 registerPlugin(FilePondPluginFileValidateType, FilePondPluginImagePreview);
 
@@ -25,7 +26,8 @@ type AppSettingProps = {
 };
 
 export default function AppSetting({ title, app_setting }: AppSettingProps) {
-    const [filePondFiles, setFilePondFiles] = useState<any[]>([]);
+    const [appIconPond, setAppIconPond] = useState<any[]>([]);
+    const [schoolIconPond, setSchoolIconPond] = useState<any[]>([]);
     const [onReversingMaps, setOnReversingMaps] = useState(false);
 
     const {
@@ -47,6 +49,13 @@ export default function AppSetting({ title, app_setting }: AppSettingProps) {
         check_in_end: app_setting.check_in_end ?? "",
         check_out_start: app_setting.check_out_start ?? "",
         check_out_end: app_setting.check_out_end ?? "",
+        // School Field
+        school_name: app_setting.school_name ?? "",
+        school_icon: null as File | null,
+        school_address: app_setting.school_address ?? "",
+        school_phone: app_setting.school_phone ?? "",
+        school_email: app_setting.school_email ?? "",
+        school_website: app_setting.school_website ?? "",
     });
 
     const loadInitiateAppIcon = async () => {
@@ -66,7 +75,7 @@ export default function AppSetting({ title, app_setting }: AppSettingProps) {
                     type: blob.type,
                 });
 
-                setFilePondFiles([
+                setAppIconPond([
                     {
                         source: file,
                         options: {
@@ -76,7 +85,36 @@ export default function AppSetting({ title, app_setting }: AppSettingProps) {
                 ]);
             } catch (error) {
                 console.error("Error loading image:", error);
-                setFilePondFiles([]);
+                setAppIconPond([]);
+            }
+        }
+        if (app_setting.school_icon) {
+            try {
+                const imageUrl = app_setting.school_icon.startsWith("http")
+                    ? app_setting.school_icon
+                    : `${window.location.origin}${
+                          app_setting.school_icon.startsWith("/") ? "" : "/"
+                      }${app_setting.school_icon}`;
+
+                const response = await fetch(imageUrl, { mode: "no-cors" });
+                if (!response.ok) throw new Error("Failed to fetch image");
+
+                const blob = await response.blob();
+                const file = new File([blob], "favicon.png", {
+                    type: blob.type,
+                });
+
+                setSchoolIconPond([
+                    {
+                        source: file,
+                        options: {
+                            type: "local",
+                        },
+                    },
+                ]);
+            } catch (error) {
+                console.error("Error loading image:", error);
+                setSchoolIconPond([]);
             }
         }
     };
@@ -112,8 +150,8 @@ export default function AppSetting({ title, app_setting }: AppSettingProps) {
         }
     });
 
-    const handleAppIcon = (file: File | null) => {
-        setData("app_icon", file);
+    const handleIcon = (key: "app_icon" | "school_icon", file: File | null) => {
+        setData(key, file);
     };
 
     const validateForm: () => boolean = () => {
@@ -124,6 +162,26 @@ export default function AppSetting({ title, app_setting }: AppSettingProps) {
         if (!data.app_icon) {
             errors.app_icon = "Ikon aplikasi tidak boleh kosong";
         }
+
+        if (!data.school_name) {
+            errors.school_name = "Nama sekolah tidak boleh kosong";
+        }
+        if (!data.school_icon) {
+            errors.school_icon = "Logo sekolah tidak boleh kosong";
+        }
+        if (!data.school_address) {
+            errors.school_address = "Alamat sekolah tidak boleh kosong";
+        }
+        if (!data.school_phone) {
+            errors.school_phone = "Nomor telepon sekolah tidak boleh kosong";
+        }
+        if (!data.school_email) {
+            errors.school_email = "Email sekolah tidak boleh kosong";
+        }
+        if (!data.school_website) {
+            errors.school_website = "Website sekolah tidak boleh kosong";
+        }
+
         if (!data.default_latitude || data.default_latitude === 0) {
             errors.default_latitude = "Latitude tidak boleh kosong";
         }
@@ -217,14 +275,17 @@ export default function AppSetting({ title, app_setting }: AppSettingProps) {
                         <label className="text-base mb-1">Ikon Aplikasi</label>
                         <FilePond
                             oninit={loadInitiateAppIcon}
-                            files={filePondFiles}
+                            files={appIconPond}
                             onupdatefiles={(fileItems) => {
                                 const selectedFile =
                                     fileItems.length > 0
                                         ? fileItems[0].file
                                         : null;
-                                handleAppIcon(selectedFile as File | null);
-                                setFilePondFiles(fileItems);
+                                handleIcon(
+                                    "app_icon",
+                                    selectedFile as File | null
+                                );
+                                setAppIconPond(fileItems);
                             }}
                             allowImagePreview={true}
                             allowMultiple={false}
@@ -233,6 +294,143 @@ export default function AppSetting({ title, app_setting }: AppSettingProps) {
                         />
                         {errors.app_icon && (
                             <ErrorInput error={errors.app_icon} />
+                        )}
+                    </div>
+                </div>
+
+                <Separator className="my-5 h-1 rounded-full bg-blue-200" />
+
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">Nama Sekolah</label>
+                        <Input
+                            type="text"
+                            placeholder="Masukkan Nama Sekolah"
+                            value={data.school_name}
+                            onChange={(e) =>
+                                setData("school_name", e.target.value)
+                            }
+                            className={`py-6 ${
+                                errors.school_name ? "border-red-500" : ""
+                            }`}
+                        />
+                        {errors.school_name && (
+                            <ErrorInput error={errors.school_name} />
+                        )}
+                    </div>
+                </div>
+
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">Logo Sekolah</label>
+                        <FilePond
+                            oninit={loadInitiateAppIcon}
+                            files={schoolIconPond}
+                            onupdatefiles={(fileItems) => {
+                                const selectedFile =
+                                    fileItems.length > 0
+                                        ? fileItems[0].file
+                                        : null;
+                                handleIcon(
+                                    "school_icon",
+                                    selectedFile as File | null
+                                );
+                                setSchoolIconPond(fileItems);
+                            }}
+                            allowImagePreview={true}
+                            allowMultiple={false}
+                            acceptedFileTypes={["image/jpeg", "image/png"]}
+                            labelIdle='<span class="filepond--label-action">Cari File Gambar</span>'
+                        />
+                        {errors.school_icon && (
+                            <ErrorInput error={errors.school_icon} />
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex mb-5 w-full gap-3 items-center">
+                    <div className="w-full">
+                        <div className="flex flex-col">
+                            <label className="text-base mb-1">
+                                Email Sekolah
+                            </label>
+                            <Input
+                                type="email"
+                                placeholder="Masukkan Email Sekolah"
+                                value={data.school_email}
+                                onChange={(e) =>
+                                    setData("school_email", e.target.value)
+                                }
+                                className={`py-6 ${
+                                    errors.school_email ? "border-red-500" : ""
+                                }`}
+                            />
+                            {errors.school_email && (
+                                <ErrorInput error={errors.school_email} />
+                            )}
+                        </div>
+                    </div>
+                    <div className="w-full">
+                        <div className="flex flex-col">
+                            <label className="text-base mb-1">
+                                No Telepon Sekolah
+                            </label>
+                            <Input
+                                type="tel"
+                                placeholder="Masukkan No Telepon Sekolah"
+                                value={data.school_phone}
+                                onChange={(e) =>
+                                    setData("school_phone", e.target.value)
+                                }
+                                className={`py-6 ${
+                                    errors.school_phone ? "border-red-500" : ""
+                                }`}
+                            />
+                            {errors.school_phone && (
+                                <ErrorInput error={errors.school_phone} />
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">Alamat Sekolah</label>
+                        <Textarea
+                            placeholder="Masukkan Alamat Sekolah"
+                            value={data.school_address}
+                            onChange={(e) =>
+                                setData("school_address", e.target.value)
+                            }
+                            rows={3}
+                            className={`resize-none ${
+                                errors.school_address ? "border-red-500" : ""
+                            }`}
+                        />
+                        {errors.school_address && (
+                            <ErrorInput error={errors.school_address} />
+                        )}
+                    </div>
+                </div>
+
+                <div className="mb-5">
+                    <div className="flex flex-col">
+                        <label className="text-base mb-1">
+                            Webiste Sekolah
+                        </label>
+                        <Input
+                            type="text"
+                            placeholder="Masukkan Webiste Sekolah"
+                            value={data.school_website}
+                            onChange={(e) =>
+                                setData("school_website", e.target.value)
+                            }
+                            className={`py-6 ${
+                                errors.school_website ? "border-red-500" : ""
+                            }`}
+                        />
+                        {errors.school_website && (
+                            <ErrorInput error={errors.school_website} />
                         )}
                     </div>
                 </div>

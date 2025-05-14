@@ -54,7 +54,7 @@ export default function PDFExportLayout({
                     <div className="flex flex-col justify-center items-center w-[70px] h-[70px]">
                         {/* School Icon */}
                         <img
-                            src="/assets/img/favicon.png"
+                            src="/assets/img/school_icon.png"
                             className="object-contain w-full h-full"
                             alt="Logo"
                         />
