@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\Workshop;
@@ -47,6 +48,55 @@ class StudentController extends Controller
             'title' => 'Informasi Siswa',
             'student' => $student,
             'latest_activity' => $latest_activity,
+        ]);
+    }
+
+    public function attendanceList(Request $request)
+    {
+        $filtered_date = $request->input('date') ?: null;
+        $filtered_month = $request->input('month') ?: null;
+        $student_id = $request->input('student_id') ?: null;
+
+        $supervisor = Supervisor::where('user_id', Auth::id())->first();
+        $workshops_id = Workshop::where('supervisor_id', $supervisor->id)->pluck('id');
+
+        $student_options = Student::with('user')
+            ->whereIn('workshop_id', $workshops_id)
+            ->get();
+
+        $attendances = Attendance::with('student')
+            ->when($filtered_date, function ($query, $filtered_date) {
+                $query->whereDate('check_in', $filtered_date);
+            })
+            ->when($filtered_month, function ($query, $filtered_month) {
+                $query->whereMonth('check_in', $filtered_month);
+            })
+            ->when($student_id, function ($query, $student_id) {
+                $query->where('student_id', $student_id);
+            })
+            ->orderBy('check_in', 'desc')
+            ->paginate(20);
+
+        return Inertia::render('Supervisor/Student/Attendance/Index', [
+            'title' => 'Daftar Absensi',
+            'attendances' => $attendances->items(),
+            'student_options' => $student_options->map(function ($student) {
+                return [
+                    'label' => $student->full_name,
+                    'value' => "$student->id",
+                ];
+            }),
+        ]);
+    }
+
+    public function attendanceDetail($attendance_id)
+    {
+        $attendance = Attendance::with('student.workshop')->findOrFail($attendance_id);
+
+        return Inertia::render('Supervisor/Student/Attendance/Show', [
+            'title' => 'Detail Absensi ' . $attendance->student->user->full_name,
+            'student' => $attendance->student,
+            'attendance' => $attendance,
         ]);
     }
 }
