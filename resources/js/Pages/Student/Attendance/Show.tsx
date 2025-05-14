@@ -14,11 +14,13 @@ import { ymdToIdDate } from "@/Services/additionalService";
 type StudentAttendanceShowProps = {
     title: string;
     attendance: Attendance;
+    workshop: Workshop;
 };
 
 export default function StudentAttendanceShow({
     title,
     attendance,
+    workshop,
 }: StudentAttendanceShowProps) {
     return (
         <MainLayout title={title as string}>
@@ -47,6 +49,9 @@ export default function StudentAttendanceShow({
                 <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-green-100 to-white rounded-l-md"></div>
                 <MapPicker
                     readonly={true}
+                    attendance_mode={true}
+                    workshop_latitude={workshop.latitude ?? undefined}
+                    workshop_longitude={workshop.longitude ?? undefined}
                     latitude={attendance.latitude_in ?? undefined}
                     longitude={attendance.longitude_in ?? undefined}
                 />
@@ -79,6 +84,9 @@ export default function StudentAttendanceShow({
                 {attendance.check_out != null && (
                     <MapPicker
                         readonly={true}
+                        attendance_mode={true}
+                        workshop_latitude={workshop.latitude ?? undefined}
+                        workshop_longitude={workshop.longitude ?? undefined}
                         latitude={attendance.latitude_out ?? undefined}
                         longitude={attendance.longitude_out ?? undefined}
                     />

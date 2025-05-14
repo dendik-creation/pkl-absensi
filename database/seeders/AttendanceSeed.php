@@ -53,15 +53,5 @@ class AttendanceSeed extends Seeder
             'latitude_out' => -6.826408 + (20 / 111320),
             'longitude_out' => 110.876416 + (20 / (111320 * cos(deg2rad(-6.826408)))),
         ]);
-        Attendance::create([
-            'student_id' => 3,
-            'check_in' => now()->format('Y-m-d') . ' 09:30:22',
-            'check_out' => now()->format('Y-m-d') . ' 18:40:55',
-            'status' => 'PRESENT',
-            'latitude_in' => -6.826408 + (20 / 111320),
-            'longitude_in' => 110.876416 + (20 / (111320 * cos(deg2rad(-6.826408)))),
-            'latitude_out' => -6.826408 + (20 / 111320),
-            'longitude_out' => 110.876416 + (20 / (111320 * cos(deg2rad(-6.826408)))),
-        ]);
     }
 }

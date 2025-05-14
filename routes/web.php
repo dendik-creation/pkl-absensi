@@ -86,6 +86,7 @@ Route::middleware('auth')->group(function(){
         Route::prefix('/attendance')->controller(StudentAttendance::class)->group(function () {
             Route::get('/', 'index');
             Route::get('/create', 'create');
+            Route::get('/export', 'export');
             Route::get('/{id}', 'show');
             Route::post('/', 'store');
         });
@@ -93,6 +94,7 @@ Route::middleware('auth')->group(function(){
         Route::prefix('/journal')->controller(StudentJournal::class)->group(function () {
             Route::get('/', 'index');
             Route::get('/create', 'create');
+            Route::get('/export', 'export');
             Route::get('/{id}', 'show');
             Route::get('/{id}/edit', 'edit');
             Route::post('/', 'store');
