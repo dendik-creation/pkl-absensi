@@ -1,3 +1,4 @@
+import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -168,4 +169,28 @@ export const clearLocalStorage = () => {
     if (typeof window !== "undefined") {
         localStorage.clear();
     }
+};
+
+export const requestNotificationPermission = async (
+    from: "student" | "supervisor",
+    setGrantedNotif: React.Dispatch<React.SetStateAction<boolean>>
+): Promise<boolean> => {
+    if (!("Notification" in window)) return false;
+
+    const handlePermission = (permission: NotificationPermission) => {
+        const isGranted = permission === "granted";
+        setGrantedNotif(isGranted);
+        BlastSonner({
+            message: isGranted ? "Notifikasi diizinkan" : "Notifikasi ditolak",
+            type: isGranted ? BlastType.SUCCESS : BlastType.ERROR,
+        });
+        return isGranted;
+    };
+
+    if (Notification.permission === "default") {
+        const permission = await Notification.requestPermission();
+        return handlePermission(permission);
+    }
+
+    return handlePermission(Notification.permission);
 };

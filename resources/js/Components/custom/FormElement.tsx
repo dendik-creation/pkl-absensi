@@ -93,12 +93,14 @@ export function SelectSearchInput({
     onChange,
     placeholder,
     removeValue,
+    className,
 }: {
     value: string;
     options: { label: string; value: string }[];
     onChange: (value: string | number) => void;
     placeholder?: string;
     removeValue: () => void;
+    className?: string;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -108,7 +110,10 @@ export function SelectSearchInput({
                 <div
                     role="combobox"
                     aria-expanded={open}
-                    className="min-w-full py-3 justify-between relative border border-gray-300 rounded-md px-4 flex items-center cursor-pointer"
+                    className={cn(
+                        "min-w-full py-3 justify-between relative border border-gray-300 rounded-md px-4 flex items-center cursor-pointer",
+                        className
+                    )}
                 >
                     {value ? (
                         <span className="font-normal text-base">

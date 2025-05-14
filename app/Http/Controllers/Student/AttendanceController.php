@@ -2,23 +2,29 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Exports\AttendanceExport;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\GlobalSetting;
 use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 
 class AttendanceController extends Controller
 {
-    private function getAuthUser(){
+    private function getAuthUser()
+    {
         return User::where('id', Auth::id())->with('student')->first();
     }
 
-    private function currentAttendanceTime($setting){
+    private function currentAttendanceTime($setting)
+    {
         $now = now();
         $attendance_in = [
             'start' => $setting['check_in_start'],
@@ -38,11 +44,26 @@ class AttendanceController extends Controller
         return 'DI LUAR WAKTU';
     }
 
-    public function index(){
+    public function index(Request $request)
+    {
         $user = $this->getAuthUser();
         $setting = GlobalSetting::first();
         $attendance_time_name = $this->currentAttendanceTime($setting);
-        $attendances = Attendance::where('student_id', $user->student->id)->limit(20)->orderBy('check_in', 'desc')->get();
+        $filtered_date = $request->input('date') ?: null;
+        $filtered_month = $request->input('month') ?: null;
+
+        $attendances = Attendance::where('student_id', $user->student->id)
+            ->when($filtered_date, function ($query) use ($filtered_date) {
+                $query->whereDate('check_in', $filtered_date);
+            })
+            ->when($filtered_month, function ($query) use ($filtered_month) {
+                $query->whereMonth('check_in', $filtered_month);
+            })
+            ->when(!$filtered_date && !$filtered_month, function ($query) {
+                $query->limit(20);
+            })
+            ->orderBy('check_in', 'desc')
+            ->get();
         return inertia('Student/Attendance/Index', [
             'title' => 'Daftar Absensi',
             'attendances' => $attendances,
@@ -51,23 +72,22 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function create(Request $request){
+    public function create(Request $request)
+    {
         $now = now()->format('Y-m-d');
         $setting = GlobalSetting::first();
         $attendance_time_name = $this->currentAttendanceTime($setting);
         $user = $this->getAuthUser();
         $student = Student::with('workshop')->where('id', $user->student->id)->first();
 
-        $existingAttendanceInToday = Attendance::where('student_id', $student->id)
-            ->whereDate('check_in', $now)
-            ->exists();
+        $existingAttendanceInToday = Attendance::where('student_id', $student->id)->whereDate('check_in', $now)->exists();
 
-        if ($attendance_time_name == "DI LUAR WAKTU") {
+        if ($attendance_time_name == 'DI LUAR WAKTU') {
             Session::flash('error', 'Diluar waktu absensi, akses ditolak 😁');
             return back();
         }
 
-        if($attendance_time_name == "PULANG" && !$existingAttendanceInToday){
+        if ($attendance_time_name == 'PULANG' && !$existingAttendanceInToday) {
             Session::flash('error', 'Kamu di nyatakan tidak absensi hari ini, akses ditolak 😁');
             return back();
         }
@@ -81,7 +101,8 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $attendance_time_name = $this->currentAttendanceTime(GlobalSetting::first());
 
         if ($attendance_time_name === 'MASUK') {
@@ -134,18 +155,90 @@ class AttendanceController extends Controller
             Session::flash('error', 'Waktu absensi tidak valid.');
         }
 
-        if($request->has('utm_source') && $request->utm_source == 'student_dashboard'){
+        if ($request->has('utm_source') && $request->utm_source == 'student_dashboard') {
             return Inertia::location('/student/dashboard');
-        }else{
+        } else {
             return Inertia::location('/student/attendance');
         }
     }
 
-    public function show($id){
-        $attendance = Attendance::with('student')->findOrFail($id);
+    public function show($id)
+    {
+        $attendance = Attendance::with('student.workshop')->findOrFail($id);
         return inertia('Student/Attendance/Show', [
             'title' => 'Detail Absensi',
             'attendance' => $attendance,
+            'workshop' => $attendance->student->workshop,
         ]);
+    }
+
+    private function attendanceExport($studentId, $monthSelected = null)
+    {
+        $startDate = $monthSelected
+            ? Carbon::create(now()->year, $monthSelected, 1)
+            : Attendance::where('student_id', $studentId)
+                ->orderBy('check_in', 'asc')
+                ->value('check_in');
+
+        $startDate = $startDate ? Carbon::parse($startDate)->startOfDay() : now()->startOfDay();
+        $endDate = now()->endOfDay();
+
+        $attendancesFromDb = Attendance::where('student_id', $studentId)
+            ->whereBetween('check_in', [$startDate, $endDate])
+            ->orderBy('check_in', 'asc')
+            ->get()
+            ->keyBy(function ($attendance) {
+                return Carbon::parse($attendance->check_in)->toDateString();
+            });
+
+        $attendances = [];
+        $currentDate = $startDate->copy();
+
+        while ($currentDate->lte($endDate)) {
+            $dateString = $currentDate->toDateString();
+
+            if ($attendancesFromDb->has($dateString)) {
+                $attendances[] = $attendancesFromDb->get($dateString);
+            } else {
+                $attendances[] = [
+                    'student_id' => $studentId,
+                    'check_in' => $currentDate->toDateTimeString(),
+                    'check_out' => null,
+                    'status' => Attendance::ABSENT,
+                    'latitude_in' => null,
+                    'longitude_in' => null,
+                    'latitude_out' => null,
+                    'longitude_out' => null,
+                    'reason' => null,
+                ];
+            }
+
+            $currentDate->addDay();
+        }
+
+        return $attendances;
+    }
+
+    public function export(Request $request)
+    {
+        $setting = GlobalSetting::first();
+        $student = Student::where('user_id', Auth::user()->id)->first();
+        $format = $request->input('format');
+        $month_selected = $request->input('month') ?: null;
+
+        if ($format == 'PDF') {
+            $attendances = $this->attendanceExport($student->id, $month_selected);
+
+            return Inertia::render('Student/Attendance/Export', [
+                'title' => $student->nis . '_' . 'ABSENSI' . '_' . ($month_selected == null ? 'ALL' : strtoupper(substr(Carbon::create()->month(intval($month_selected))->format('F'), 0, 3))),
+                'attendances' => $attendances,
+                'setting' => $setting,
+                'month_selected' => $month_selected,
+                'student' => $student,
+            ]);
+        } elseif ($format == 'XLSX') {
+            $attendances = $this->attendanceExport($student->id, $month_selected);
+            return Excel::download(new AttendanceExport($attendances, $student, $month_selected), $student->nis . '_' . 'ABSENSI' . '_' . ($month_selected == null ? 'ALL' : strtoupper(substr(Carbon::create()->month(intval($month_selected))->format('F'), 0, 3))) . '.xlsx');
+        }
     }
 }

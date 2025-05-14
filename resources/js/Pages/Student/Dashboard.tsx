@@ -6,6 +6,7 @@ import {
     currentTimeGreeting,
     distanceConverter,
     isWithinTimeRange,
+    requestNotificationPermission,
     setLocalStorage,
     ymdToIdDate,
 } from "@/Services/additionalService";
@@ -17,10 +18,12 @@ import { PiStudentFill } from "react-icons/pi";
 import { LuMapPinCheck } from "react-icons/lu";
 import {
     Ban,
+    Bell,
     ChevronRight,
     ClipboardCheck,
     Clock8,
     Hourglass,
+    MapPinCheck,
     NotebookText,
 } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
@@ -61,14 +64,30 @@ export default function StudentDashboard({
         });
     }
     const [currentTime, setCurrentTime] = useState(new Date().toISOString());
+    const [grantedNotif, setGrantedNotif] = useState(
+        Notification.permission == "granted"
+    );
     setLocalStorage("user_role", user_role);
     setLocalStorage("default_latitude", setting?.default_latitude);
     setLocalStorage("default_longitude", setting?.default_longitude);
 
     useEffect(() => {
-        const interval = setInterval(() => {
+        const handleNotificationPermission = async () => {
+            if (!grantedNotif) {
+                await requestNotificationPermission("student", setGrantedNotif);
+            }
+        };
+
+        handleNotificationPermission();
+    }, [grantedNotif]);
+
+    useEffect(() => {
+        const updateCurrentTime = () => {
             setCurrentTime(new Date().toISOString());
-        }, 60000);
+        };
+
+        const interval = setInterval(updateCurrentTime, 60000);
+        updateCurrentTime();
 
         return () => clearInterval(interval);
     }, []);
@@ -167,6 +186,37 @@ export default function StudentDashboard({
                         </div>
                     </Card>
                 </div>
+                {!grantedNotif && (
+                    <div
+                        className="z-10 group relative mb-3 pb-3 cursor-pointer"
+                        onClick={() =>
+                            requestNotificationPermission(
+                                "student",
+                                setGrantedNotif
+                            )
+                        }
+                    >
+                        <Card className="flex p-3 flex-row w-full relative overflow-hidden shadow-md">
+                            <div
+                                className={clsx(
+                                    "absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-yellow-200/50"
+                                )}
+                            ></div>
+                            <div
+                                className={clsx(
+                                    "z-10 absolute right-1.5 bottom-2 opacity-50 to-yellow-200/50"
+                                )}
+                            >
+                                <Bell size={35} />
+                            </div>
+                            <div className="relative z-10 p-1">
+                                <h3 className="font-medium group-hover:underline text-gray-700">
+                                    Izinkan notifikasi untuk pengingat absensi
+                                </h3>
+                            </div>
+                        </Card>
+                    </div>
+                )}
                 <MenuListInDashboard className="mb-6" menuItems={menuItems} />
 
                 {latest_activity?.attendance == null &&
@@ -175,7 +225,7 @@ export default function StudentDashboard({
                     setting?.check_in_end,
                     currentTime
                 ) ? (
-                    <Card className="p-4 relative overflow-hidden shadow-md">
+                    <Card className="p-4 relative overflow-hidden shadow-md mb-5">
                         <div className="absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-red-100 z-0"></div>
                         {new Date(currentTime) >
                         new Date(`1970-01-01T${setting?.check_in_end}`) ? (
@@ -237,8 +287,8 @@ export default function StudentDashboard({
                 ) : (
                     <Card className="p-4 relative overflow-hidden shadow-md mb-4">
                         <div className="absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-[#FFFAF0] z-0"></div>
-                        <ClipboardCheck
-                            className="absolute z-10 -right-0 -bottom-4 text-[#b4a08e] opacity-70"
+                        <MapPinCheck
+                            className="absolute z-10 -right-0 -bottom-3 text-[#b4a08e] opacity-70"
                             size={90}
                         />
                         <div className="z-10 flex flex-col justify-start items-start relative">
@@ -274,7 +324,7 @@ export default function StudentDashboard({
                         setting.check_out_end,
                         currentTime
                     ) && (
-                        <div className="">
+                        <div className="mb-5">
                             {latest_activity?.attendance != null &&
                             latest_activity?.attendance?.check_out == null ? (
                                 <Link
@@ -298,8 +348,8 @@ export default function StudentDashboard({
                             ) : (
                                 <Card className="p-4 relative overflow-hidden shadow-md">
                                     <div className="absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-amber-100 opacity-50 z-0"></div>
-                                    <ClipboardCheck
-                                        className="absolute z-10 -right-0 -bottom-4 text-amber-500 opacity-50"
+                                    <MapPinCheck
+                                        className="absolute z-10 -right-0 -bottom-3 text-amber-500 opacity-50"
                                         size={90}
                                     />
                                     <div className="z-10 flex flex-col justify-start items-start relative">
@@ -328,6 +378,58 @@ export default function StudentDashboard({
                             )}
                         </div>
                     )}
+                {latest_activity?.journal == null ? (
+                    <div>
+                        {new Date(currentTime) <
+                            new Date(`1970-01-01T${setting?.check_in_end}`) && (
+                            <Link href={"/student/journal/create" as string}>
+                                <Card className="p-4 relative overflow-hidden shadow-md">
+                                    <div className="absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-red-100 z-0"></div>
+                                    <ChevronRight className="absolute z-10 right-3 top-7 text-red-500" />
+                                    <div className="z-10 flex flex-col justify-start items-start relative">
+                                        <h3 className="font-semibold text-slate-700 mb-0">
+                                            Jurnal kegiatan hari ini
+                                        </h3>
+                                        <span className="text-slate-700">
+                                            Klik untuk menambah jurnal
+                                        </span>
+                                    </div>
+                                </Card>
+                            </Link>
+                        )}
+                    </div>
+                ) : (
+                    <Card className="p-4 relative overflow-hidden shadow-md">
+                        <div className="absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-blue-100 opacity-50 z-0"></div>
+                        <ClipboardCheck
+                            className="absolute z-10 -right-0 -bottom-4 text-blue-500 opacity-50"
+                            size={90}
+                        />
+                        <div className="z-10 flex flex-col justify-start items-start relative">
+                            <h3 className="font-semibold text-slate-700 mb-0">
+                                Kamu sudah mengisi jurnal hari ini
+                            </h3>
+                            <span className="text-slate-700">
+                                {ymdToIdDate(
+                                    latest_activity?.journal?.date.toString()
+                                )}
+                            </span>
+                            <span
+                                className="text-slate-700"
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        latest_activity?.journal.activity
+                                            ?.length > 30
+                                            ? `${latest_activity?.journal.activity.substring(
+                                                  0,
+                                                  30
+                                              )}...`
+                                            : latest_activity?.journal.activity,
+                                }}
+                            ></span>
+                        </div>
+                    </Card>
+                )}
             </div>
         </MainLayout>
     );

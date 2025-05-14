@@ -251,6 +251,13 @@ export default function StudentAttendance({
                             Lokasi Terkini Siswa
                         </label>
                         <MapPicker
+                            attendance_mode={true}
+                            workshop_latitude={
+                                student?.workshop?.latitude ?? undefined
+                            }
+                            workshop_longitude={
+                                student?.workshop?.longitude ?? undefined
+                            }
                             readonly={true}
                             latitude={
                                 attendance_time_name === "MASUK"

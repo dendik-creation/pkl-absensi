@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             DummyUserSeed::class,
             WorkshopSeed::class,
             AttendanceSeed::class,
+            JournalSeed::class,
         ]);
     }
 }
