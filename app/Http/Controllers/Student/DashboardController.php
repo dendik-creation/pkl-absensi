@@ -41,6 +41,7 @@ class DashboardController extends Controller
         return Inertia::render('Student/Dashboard', [
             'title' => 'Dashboard',
             'student' => $student,
+            'user_role' => Auth::user()->role,
             'latest_activity' => $latest_activity,
             'setting' => $setting,
         ]);

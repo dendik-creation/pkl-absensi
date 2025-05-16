@@ -1,6 +1,8 @@
+import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import React from "react";
 
 export const ymdToIdDate = (
     dateString: string | null | undefined,
@@ -70,8 +72,15 @@ export const inputDebounce = (
     };
 };
 
-export const getFullAddress = async (lat: number, lon: number) => {
+export const getFullAddress = async (
+    lat: number,
+    lon: number,
+    setFindingAddress?: React.Dispatch<React.SetStateAction<boolean>>
+) => {
     try {
+        if (setFindingAddress) {
+            setFindingAddress(true);
+        }
         const response = await axios.get(
             `https://nominatim.openstreetmap.org/reverse`,
             {
@@ -85,8 +94,15 @@ export const getFullAddress = async (lat: number, lon: number) => {
         );
         return response.data.display_name || "";
     } catch (error) {
+        if (setFindingAddress) {
+            setFindingAddress(false);
+        }
         console.error("Gagal mengambil alamat:", error);
         return "";
+    } finally {
+        if (setFindingAddress) {
+            setFindingAddress(false);
+        }
     }
 };
 
@@ -94,6 +110,14 @@ export const handleNipNisInput = (value: string) => {
     const regex = /^[0-9]+$/;
     if (!regex.test(value)) {
         return value.replace(/[^0-9]/g, "");
+    }
+    return value;
+};
+
+export const handleNumericInput = (value: string) => {
+    const regex = /^[0-9.-]+$/;
+    if (!regex.test(value)) {
+        return value.replace(/[^0-9.-]/g, "");
     }
     return value;
 };
@@ -125,4 +149,48 @@ export const isWithinTimeRange = (
     const current = new Date(currentTime);
 
     return current >= start && current <= end;
+};
+
+export const setLocalStorage = (key: string, value: any) => {
+    if (typeof window !== "undefined") {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+};
+
+export const getLocalStorage = (key: string) => {
+    if (typeof window !== "undefined") {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : null;
+    }
+    return null;
+};
+
+export const clearLocalStorage = () => {
+    if (typeof window !== "undefined") {
+        localStorage.clear();
+    }
+};
+
+export const requestNotificationPermission = async (
+    from: "student" | "supervisor",
+    setGrantedNotif: React.Dispatch<React.SetStateAction<boolean>>
+): Promise<boolean> => {
+    if (!("Notification" in window)) return false;
+
+    const handlePermission = (permission: NotificationPermission) => {
+        const isGranted = permission === "granted";
+        setGrantedNotif(isGranted);
+        BlastSonner({
+            message: isGranted ? "Notifikasi diizinkan" : "Notifikasi ditolak",
+            type: isGranted ? BlastType.SUCCESS : BlastType.ERROR,
+        });
+        return isGranted;
+    };
+
+    if (Notification.permission === "default") {
+        const permission = await Notification.requestPermission();
+        return handlePermission(permission);
+    }
+
+    return handlePermission(Notification.permission);
 };

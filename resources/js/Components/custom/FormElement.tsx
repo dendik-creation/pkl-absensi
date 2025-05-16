@@ -1,4 +1,10 @@
-import { TriangleAlert, Search, CircleX, CalendarIcon } from "lucide-react";
+import {
+    TriangleAlert,
+    Search,
+    CircleX,
+    CalendarIcon,
+    ArrowDownToLine,
+} from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "../ui/input";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -28,6 +34,12 @@ import {
 import { Calendar } from "@/Components/ui/calendar";
 import { ymdToIdDate } from "@/Services/additionalService";
 import RichTextEditor from "@mantine/rte";
+import { FilePond, registerPlugin } from "react-filepond";
+import "filepond/dist/filepond.min.css";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { FiLoader } from "react-icons/fi";
+
+registerPlugin(FilePondPluginFileValidateType);
 
 type ErrorInputProps = {
     error: string | null;
@@ -81,12 +93,14 @@ export function SelectSearchInput({
     onChange,
     placeholder,
     removeValue,
+    className,
 }: {
     value: string;
     options: { label: string; value: string }[];
     onChange: (value: string | number) => void;
     placeholder?: string;
     removeValue: () => void;
+    className?: string;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -96,7 +110,10 @@ export function SelectSearchInput({
                 <div
                     role="combobox"
                     aria-expanded={open}
-                    className="min-w-full py-3 justify-between relative border border-gray-300 rounded-md px-4 flex items-center cursor-pointer"
+                    className={cn(
+                        "min-w-full py-3 justify-between relative border border-gray-300 rounded-md px-4 flex items-center cursor-pointer",
+                        className
+                    )}
                 >
                     {value ? (
                         <span className="font-normal text-base">
@@ -373,6 +390,102 @@ export default function RichTextEditorInput({
     );
 }
 
+export function ImportFileDrawer({
+    title,
+    description,
+    file,
+    onFileChange,
+    onSubmit,
+    submitting,
+    templatePath,
+    isOpen,
+    onClose,
+}: {
+    title: string;
+    description: string;
+    file: File | null;
+    onFileChange: (file: File | null) => void;
+    onSubmit: (e: FormEvent) => void;
+    submitting: boolean;
+    templatePath: string;
+    isOpen: boolean;
+    onClose: () => void;
+}) {
+    const handleDownloadTemplate = () => {
+        const link = document.createElement("a");
+        link.href = new URL(templatePath, window.location.origin).toString();
+        link.download =
+            templatePath.substring(templatePath.lastIndexOf("/") + 1) ||
+            "template.xlsx";
+        document.body.append(link);
+        link.click();
+        link.remove();
+    };
+    return (
+        <Drawer open={isOpen} onOpenChange={onClose}>
+            <DrawerContent className="z-[1000] max-w-2xl mx-auto mb-4">
+                <DrawerHeader className="flex flex-col items-start">
+                    <DrawerTitle>{title}</DrawerTitle>
+                    <DrawerDescription className="text-start mb-3">
+                        {description}
+                    </DrawerDescription>
+                    <div className="w-full flex flex-col gap-2">
+                        <Button
+                            className="w-full bg-yellow-200 hover:bg-yellow-300"
+                            variant="outline"
+                            onClick={handleDownloadTemplate}
+                        >
+                            <ArrowDownToLine size={20} />
+                            <span>Unduh template excel</span>
+                        </Button>
+                        <FilePond
+                            allowProcess={true}
+                            className={"my-4"}
+                            files={file ? [file] : []}
+                            onupdatefiles={(fileItems) => {
+                                const selectedFile =
+                                    fileItems.length > 0
+                                        ? fileItems[0].file
+                                        : null;
+                                onFileChange(selectedFile as File | null);
+                            }}
+                            allowMultiple={false}
+                            acceptedFileTypes={[
+                                "application/vnd.ms-excel",
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            ]}
+                            labelIdle='<span class="filepond--label-action">Cari File Excel</span>'
+                        />
+                    </div>
+                </DrawerHeader>
+                <DrawerFooter>
+                    <Button
+                        className="bg-blue-200 border hover:bg-blue-300"
+                        variant="outline"
+                        onClick={onSubmit}
+                        disabled={!file || submitting}
+                    >
+                        {submitting ? (
+                            <FiLoader className="animate-spin" />
+                        ) : (
+                            "Import"
+                        )}
+                    </Button>
+                    <div className="mt-2">
+                        <Button
+                            className="w-full bg-red-200 border hover:bg-red-300"
+                            variant="outline"
+                            onClick={onClose}
+                        >
+                            Batal
+                        </Button>
+                    </div>
+                </DrawerFooter>
+            </DrawerContent>
+        </Drawer>
+    );
+}
+
 export function DrawerConfirmAction({
     title,
     description,
@@ -388,7 +501,7 @@ export function DrawerConfirmAction({
 }) {
     return (
         <Drawer open={isOpen} onOpenChange={onClose}>
-            <DrawerContent className="z-[1000] mb-4">
+            <DrawerContent className="z-[1000] max-w-2xl mx-auto mb-4">
                 <DrawerHeader className="flex flex-col items-start">
                     <DrawerTitle>{title}</DrawerTitle>
                     <DrawerDescription className="text-start">

@@ -17,7 +17,7 @@ export default function BlastSonner({ type, message }: BlastSonnerProps) {
             return toast.success("Sukses", {
                 richColors: true,
                 description: message,
-                icon: "✅",
+                icon: "😃",
                 style: {
                     fontFamily: "Space Grotesk",
                 },
@@ -26,7 +26,7 @@ export default function BlastSonner({ type, message }: BlastSonnerProps) {
             return toast.error("Gagal", {
                 richColors: true,
                 description: message,
-                icon: "❌",
+                icon: "😥",
                 style: {
                     fontFamily: "Space Grotesk",
                 },
@@ -35,7 +35,7 @@ export default function BlastSonner({ type, message }: BlastSonnerProps) {
             return toast.warning("Peringatan", {
                 description: message,
                 richColors: true,
-                icon: "⚠️",
+                icon: "🤨",
                 style: {
                     fontFamily: "Space Grotesk",
                 },

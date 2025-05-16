@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\GlobalSetting;
 use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\Workshop;
@@ -74,17 +75,36 @@ class DashboardController extends Controller
         ];
     }
 
+    private function latestAttendances($workshops_id)
+    {
+        $attendances = Attendance::with('student.workshop')
+            ->whereHas('student', function ($query) use ($workshops_id) {
+                $query->whereIn('workshop_id', $workshops_id);
+            })
+            ->latest()
+            ->take(5)
+            ->get();
+        return $attendances;
+    }
+
     public function index()
     {
         $supervisor = Supervisor::where('user_id', Auth::id())->firstOrFail();
         $workshops_id = $supervisor->workshops->pluck('id')->toArray();
+        $setting = GlobalSetting::first();
 
         return inertia('Supervisor/Dashboard', [
             'title' => 'Dashboard',
             'supervisor' => $supervisor,
             'data' => [
+                'user_role' => Auth::user()->role,
+                'default_location' => [
+                    'latitude' => $setting->default_latitude,
+                    'longitude' => $setting->default_longitude,
+                ],
                 'attendances_daily' => $this->getDailyAttendance($workshops_id),
                 'attendances_month' => $this->getAttedanceChart($workshops_id),
+                'latest_attendances' => $this->latestAttendances($workshops_id),
             ],
         ]);
     }

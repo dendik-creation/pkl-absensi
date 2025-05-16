@@ -1,14 +1,27 @@
 import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
+import {
+    DatePickerInput,
+    SelectSearchInput,
+} from "@/Components/custom/FormElement";
 import NotFoundInList from "@/Components/custom/NotFoundInList";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/Components/ui/popover";
 import { MainLayout } from "@/Layouts/MainLayout";
 import { PageTitle } from "@/Partials/PageTitle";
-import { isWithinTimeRange, ymdToIdDate } from "@/Services/additionalService";
+import {
+    inputDebounce,
+    isWithinTimeRange,
+    ymdToIdDate,
+} from "@/Services/additionalService";
 import { Attendance } from "@/Types/attendance";
-import { Link, usePage } from "@inertiajs/react";
-import { ChevronRight } from "lucide-react";
-import React, { useState } from "react";
+import { Link, router, usePage } from "@inertiajs/react";
+import { ChevronRight, Download, FileDown } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { LuMapPinCheck } from "react-icons/lu";
 
 type StudentAttendanceIndexProps = {
@@ -39,6 +52,14 @@ export default function StudentAttendanceIndex({
     }
     const [attendancesData, setAttendancesData] =
         useState<Attendance[]>(attendances);
+    const [dateFilter, setDateFilter] = useState<string>("");
+    const [monthFilter, setMonthFilter] = useState<string>("");
+    const [monthOptions, setMonthOptions] = useState<
+        {
+            label: string;
+            value: string;
+        }[]
+    >([]);
     const currentTime = new Date().toISOString();
     const currentDate = new Date().toISOString().slice(0, 10);
     const todayAttendedIn = attendancesData.some(
@@ -48,12 +69,110 @@ export default function StudentAttendanceIndex({
         (attendance) => attendance.check_out?.slice(0, 10) === currentDate
     );
 
+    useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const dateParam = queryParams.get("date") || "";
+        const monthParam = queryParams.get("month") || "";
+
+        setDateFilter(dateParam);
+        setMonthFilter(monthParam);
+
+        if (dateParam || monthParam) {
+            debounceValue(dateParam, monthParam);
+        }
+    }, []);
+
+    useEffect(() => {
+        const monthNow = new Date().getMonth() + 1;
+        const monthNames = [
+            "Januari",
+            "Februari",
+            "Maret",
+            "April",
+            "Mei",
+            "Juni",
+            "Juli",
+            "Agustus",
+            "September",
+            "Oktober",
+            "November",
+            "Desember",
+        ];
+
+        const updatedMonthOptions = monthNames.map((month, index) => {
+            return {
+                label: month,
+                value: new Date(new Date().setMonth(index)).toLocaleString(
+                    "id-ID",
+                    {
+                        month: "numeric",
+                    }
+                ),
+            };
+        });
+
+        setMonthOptions((prev) => [...prev, ...updatedMonthOptions]);
+    }, []);
+
+    const debounceValue = inputDebounce(
+        async (dateVal: string, monthVal: string) => {
+            router.get(
+                "/student/attendance",
+                { date: dateVal, month: monthVal },
+                {
+                    preserveState: true,
+                    replace: true,
+                    onSuccess: (page) => {
+                        setAttendancesData(
+                            page.props.attendances as Attendance[]
+                        );
+                    },
+                }
+            );
+        }
+    );
+
+    const handleMonth = (month: string | undefined) => {
+        setMonthFilter(month || "");
+        debounceValue(dateFilter, month || "");
+        setDateFilter("");
+    };
+
+    const handleDate = (date: string | undefined) => {
+        setMonthFilter("");
+        setDateFilter(date || "");
+        debounceValue(date || "");
+    };
+
     return (
         <MainLayout title={title as string}>
             <PageTitle
                 title={title as string}
                 description="Riwayat absensi siswa"
             />
+
+            <div className="grid grid-cols-2 gap-3 mb-5">
+                <DatePickerInput
+                    value={dateFilter}
+                    mode="single"
+                    placeholder="Pilih Tanggal"
+                    onChange={handleDate}
+                    className="py-2"
+                />
+
+                <SelectSearchInput
+                    value={monthFilter}
+                    placeholder="Pilih Bulan"
+                    onChange={(value) =>
+                        handleMonth(value as string | undefined)
+                    }
+                    options={monthOptions || []}
+                    className="py-2"
+                    removeValue={() => {
+                        handleMonth("");
+                    }}
+                />
+            </div>
 
             {attendance_time_name == "MASUK" &&
                 isWithinTimeRange(
@@ -114,6 +233,53 @@ export default function StudentAttendanceIndex({
                         </Button>
                     </Link>
                 )}
+
+            <Popover>
+                <PopoverTrigger asChild className="w-full">
+                    <Button
+                        size={"lg"}
+                        variant="outline"
+                        disabled={attendancesData.length === 0}
+                        className="w-full bg-blue-200 border mb-5 hover:bg-blue-300 flex justify-center items-center gap-2"
+                    >
+                        <FileDown size={20} />
+                        <span>Export Absensi</span>
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent sideOffset={8} side={"bottom"} align="center">
+                    <a
+                        href={
+                            "/student/attendance/export?format=PDF&month=" +
+                            monthFilter
+                        }
+                        target="_blank"
+                    >
+                        <Button
+                            size={"sm"}
+                            variant="outline"
+                            className="w-full bg-amber-200 border mb-2 hover:bg-amber-300 flex justify-center items-center gap-2"
+                        >
+                            <Download size={20} />
+                            <span>Format PDF</span>
+                        </Button>
+                    </a>
+                    <a
+                        href={
+                            "/student/attendance/export?format=XLSX&month=" +
+                            monthFilter
+                        }
+                    >
+                        <Button
+                            size={"sm"}
+                            variant="outline"
+                            className="w-full bg-amber-200 border mb-2 hover:bg-amber-300 flex justify-center items-center gap-2"
+                        >
+                            <Download size={20} />
+                            <span>Format Excel</span>
+                        </Button>
+                    </a>
+                </PopoverContent>
+            </Popover>
 
             <div className="grid grid-cols-1">
                 {attendancesData.length > 0 ? (
