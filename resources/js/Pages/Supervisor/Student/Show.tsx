@@ -152,10 +152,19 @@ export default function SupervisorStudentShow({
                 <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-blue-100 to-white rounded-l-md"></div>
 
                 <div className="flex flex-col z-10">
-                    <div className="mb-2">
-                        <p className="text-sm font-semibold text-slate-600">
-                            Absensi
-                        </p>
+                    <div className="mb-4">
+                        <div className="flex items-center mb-2 gap-3">
+                            <p className="text-sm font-semibold text-slate-600">
+                                Absensi
+                            </p>
+                            <Link
+                                className="text-sm flex text-blue-800 hover:text-blue-900"
+                                href={`/supervisor/student/attendance?student_id=${student.id}`}
+                            >
+                                Lihat Semua
+                                <ChevronRight className="mt-1" size={16} />
+                            </Link>
+                        </div>
                         <div className="flex flex-col">
                             <span className="text-sm">
                                 Masuk (
@@ -183,9 +192,27 @@ export default function SupervisorStudentShow({
                             </span>
                         </div>
                     </div>
-                    <KeyAndValue
-                        keyIdentifier="Jurnal"
-                        value={latest_activity?.journal?.activity}
+                    <div className="mb-2">
+                        <div className="flex items-center gap-3">
+                            <p className="text-sm font-semibold text-slate-600">
+                                Jurnal
+                            </p>
+                            <Link
+                                className="text-sm flex text-blue-800 hover:text-blue-900"
+                                href={`/supervisor/student/journal?student_id=${student.id}`}
+                            >
+                                Lihat Semua
+                                <ChevronRight className="mt-1" size={16} />
+                            </Link>
+                        </div>
+                    </div>
+                    <span
+                        className="-mt-2"
+                        dangerouslySetInnerHTML={{
+                            __html: latest_activity?.journal?.activity
+                                ? String(latest_activity?.journal?.activity)
+                                : "-",
+                        }}
                     />
                 </div>
             </Card>

@@ -222,6 +222,7 @@ export default function AdminStudentShow({
                     </div>
                     <KeyAndValue
                         keyIdentifier="Jurnal"
+                        htmlContent={true}
                         value={latest_activity?.journal?.activity}
                     />
                 </div>

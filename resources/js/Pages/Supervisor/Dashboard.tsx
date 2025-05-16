@@ -8,12 +8,14 @@ import {
 } from "@/Services/additionalService";
 import { PiStudentFill } from "react-icons/pi";
 import { HiBuildingStorefront } from "react-icons/hi2";
-import MenuListInDashboard from "@/Components/custom/MenuListInDashboard";
+import MenuListInDashboard, {
+    TableListInDashboard,
+} from "@/Components/custom/MenuListInDashboard";
 import { MenuItem } from "@/Types/menu";
 import clsx from "clsx";
 import { ApexBarChart, ChartNoData } from "@/Components/custom/Charts";
 import { useEffect, useState } from "react";
-import { Clock8 } from "lucide-react";
+import { Clock8, NotebookText } from "lucide-react";
 import { Supervisor } from "@/Types/supervisor";
 import { FaUserGear } from "react-icons/fa6";
 import { Attendance } from "@/Types/attendance";
@@ -38,6 +40,7 @@ type SupervisorDashboardProps = {
             excused: number;
             absent: number;
         }[];
+        latest_attendances: Attendance[];
     };
 };
 
@@ -63,6 +66,16 @@ export default function SupervisorDashboard({
             icon: <PiStudentFill size={24} color="#36454F" />,
             label: "Data Siswa",
             url: "/supervisor/student",
+        },
+        {
+            icon: <LuMapPinCheck size={24} color="#36454F" />,
+            label: "Absensi Siswa",
+            url: "/supervisor/student/attendance",
+        },
+        {
+            icon: <NotebookText size={24} color="#36454F" />,
+            label: "Jurnal Siswa",
+            url: "/supervisor/student/journal",
         },
         {
             icon: <HiBuildingStorefront size={24} color="#36454F" />,
@@ -217,7 +230,7 @@ export default function SupervisorDashboard({
                             </div>
                         </Card>
                     </div>
-                    <div className="">
+                    <div className="mb-5">
                         {data.attendances_month.every(
                             (attendance) =>
                                 attendance.present === 0 &&
@@ -235,6 +248,29 @@ export default function SupervisorDashboard({
                                 height={300}
                             />
                         )}
+                    </div>
+                    <div className="mb-5">
+                        <TableListInDashboard
+                            title="Absensi Terbaru"
+                            description="Data absensi terbaru yang tercatat"
+                            headers={["Siswa", "Tanggal", "Waktu", "Status"]}
+                            columnsData={data?.latest_attendances.map(
+                                (attendance) => [
+                                    `${attendance.student?.nis} - ${attendance.student?.full_name}`,
+                                    ymdToIdDate(attendance.check_in),
+                                    ymdToIdDate(
+                                        attendance.check_in,
+                                        true,
+                                        true
+                                    ),
+                                    attendance.status == "PRESENT"
+                                        ? "HADIR"
+                                        : attendance.status == "EXCUSED"
+                                        ? "IZIN"
+                                        : "ALPHA",
+                                ]
+                            )}
+                        />
                     </div>
                 </div>
             </div>

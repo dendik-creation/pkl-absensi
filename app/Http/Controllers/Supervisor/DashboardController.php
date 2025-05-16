@@ -75,6 +75,18 @@ class DashboardController extends Controller
         ];
     }
 
+    private function latestAttendances($workshops_id)
+    {
+        $attendances = Attendance::with('student.workshop')
+            ->whereHas('student', function ($query) use ($workshops_id) {
+                $query->whereIn('workshop_id', $workshops_id);
+            })
+            ->latest()
+            ->take(5)
+            ->get();
+        return $attendances;
+    }
+
     public function index()
     {
         $supervisor = Supervisor::where('user_id', Auth::id())->firstOrFail();
@@ -92,6 +104,7 @@ class DashboardController extends Controller
                 ],
                 'attendances_daily' => $this->getDailyAttendance($workshops_id),
                 'attendances_month' => $this->getAttedanceChart($workshops_id),
+                'latest_attendances' => $this->latestAttendances($workshops_id),
             ],
         ]);
     }
