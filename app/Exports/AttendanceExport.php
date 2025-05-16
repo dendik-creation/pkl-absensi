@@ -13,15 +13,15 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AttendanceExport implements FromArray, WithHeadings, WithStyles
 {
+    protected $title;
     protected $attendances;
     protected $student;
-    protected $month;
 
-    public function __construct($attendances, $student, $month)
+    public function __construct($title, $attendances, $student)
     {
+        $this->title = $title;
         $this->attendances = $attendances;
         $this->student = $student;
-        $this->month = $month ?: null;
     }
 
     private function statuses($statuses){
@@ -57,9 +57,8 @@ class AttendanceExport implements FromArray, WithHeadings, WithStyles
 
     public function headings(): array
     {
-        $monthName = $this->month ? date('F Y', mktime(0, 0, 0, $this->month, 1)) : date('F Y');
         return [
-            [($this->month ? "Absensi PKL " . $monthName : "Absensi PKL Keseluruhan")],
+            [$this->title],
             ['Nama Siswa', $this->student->full_name],
             ['NIS', $this->student->nis],
             ['Kelas', $this->student->class],

@@ -134,6 +134,7 @@ Route::middleware('auth')->group(function () {
                     ->controller(SupervisorStudent::class)
                     ->group(function () {
                         Route::get('/', 'attendanceList');
+                        Route::get('/export', 'attendanceExport');
                         Route::get('/{id}', 'attendanceDetail');
                     });
 

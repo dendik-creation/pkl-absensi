@@ -5,35 +5,34 @@ import {
 import NotFoundInList from "@/Components/custom/NotFoundInList";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
+import { MainLayout } from "@/Layouts/MainLayout";
+import { PageTitle } from "@/Partials/PageTitle";
+import { inputDebounce, ymdToIdDate } from "@/Services/additionalService";
+import { Link, router } from "@inertiajs/react";
+import { ChevronRight, Download, FileDown, PlusCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Journal } from "@/Types/journal";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
-import { MainLayout } from "@/Layouts/MainLayout";
-import { PageTitle } from "@/Partials/PageTitle";
-import { inputDebounce, ymdToIdDate } from "@/Services/additionalService";
-import { Attendance } from "@/Types/attendance";
-import { Link, router } from "@inertiajs/react";
-import { ChevronRight, Download, FileDown } from "lucide-react";
-import React, { useEffect, useState } from "react";
 
-type SupervisorStudentAttendanceIndexProps = {
-    title: string;
-    attendances: Attendance[];
+export type SupervisorStudentJournalIndexProps = {
+    title?: string;
+    journals: Journal[];
     student_options: {
         label: string;
         value: string;
     }[];
 };
 
-export default function SupervisorStudentAttendanceIndex({
+export default function SupervisorStudentJournalIndex({
     title,
-    attendances,
+    journals,
     student_options,
-}: SupervisorStudentAttendanceIndexProps) {
-    const [attendancesData, setAttendancesData] =
-        useState<Attendance[]>(attendances);
+}: SupervisorStudentJournalIndexProps) {
+    const [journalsData, setJournalsData] = useState<Journal[]>(journals);
     const [dateFilter, setDateFilter] = useState<string>("");
     const [monthFilter, setMonthFilter] = useState<string>("");
     const [studentFilter, setStudentFilter] = useState<string>("");
@@ -54,7 +53,7 @@ export default function SupervisorStudentAttendanceIndex({
         setMonthFilter(monthParam);
         setStudentFilter(studentParam);
 
-        if (dateParam || monthParam) {
+        if (dateParam || monthParam || studentParam) {
             debounceValue(dateParam, monthParam, studentParam);
         }
     }, []);
@@ -94,15 +93,13 @@ export default function SupervisorStudentAttendanceIndex({
     const debounceValue = inputDebounce(
         async (dateVal: string, monthVal: string, studentVal: string) => {
             router.get(
-                "/supervisor/student/attendance",
+                "/supervisor/student/journal",
                 { date: dateVal, month: monthVal, student_id: studentVal },
                 {
                     preserveState: true,
                     replace: true,
                     onSuccess: (page) => {
-                        setAttendancesData(
-                            page.props.attendances as Attendance[]
-                        );
+                        setJournalsData(page.props.journals as Journal[]);
                     },
                 }
             );
@@ -131,7 +128,7 @@ export default function SupervisorStudentAttendanceIndex({
         <MainLayout title={title as string}>
             <PageTitle
                 title={title as string}
-                description="Riwayat absensi siswa"
+                description="Aktivitas yang dilakukan siswa selama PKL"
             />
 
             <div className="grid grid-cols-2 gap-3 mb-5">
@@ -147,7 +144,6 @@ export default function SupervisorStudentAttendanceIndex({
                         handleStudent("");
                     }}
                 />
-
                 <DatePickerInput
                     value={dateFilter}
                     mode="single"
@@ -175,17 +171,17 @@ export default function SupervisorStudentAttendanceIndex({
                     <Button
                         size={"lg"}
                         variant="outline"
-                        disabled={attendancesData.length === 0}
+                        disabled={journalsData.length === 0}
                         className="w-full bg-blue-200 border mb-5 hover:bg-blue-300 flex justify-center items-center gap-2"
                     >
                         <FileDown size={20} />
-                        <span>Export Absensi</span>
+                        <span>Export Jurnal</span>
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent sideOffset={8} side={"bottom"} align="center">
                     <a
                         href={
-                            "/supervisor/student/attendance/export?format=PDF&month=" +
+                            "/student/journal/export?format=PDF&month=" +
                             monthFilter
                         }
                         target="_blank"
@@ -201,7 +197,7 @@ export default function SupervisorStudentAttendanceIndex({
                     </a>
                     <a
                         href={
-                            "/supervisor/student/attendance/export?format=XLSX&month=" +
+                            "/student/journal/export?format=XLSX&month=" +
                             monthFilter
                         }
                     >
@@ -218,58 +214,39 @@ export default function SupervisorStudentAttendanceIndex({
             </Popover> */}
 
             <div className="grid grid-cols-1">
-                {attendancesData.length > 0 ? (
-                    attendancesData.map((attendance, index) => (
+                {journalsData.length > 0 ? (
+                    journalsData.map((journal, index) => (
                         <Link
                             key={index}
-                            href={`/supervisor/student/attendance/${attendance.id}`}
+                            href={`/supervisor/student/journal/${journal.id}`}
                         >
                             <Card className="shadow-md p-4 mb-3 flex items-center overflow-hidden justify-between relative">
                                 <div className="z-10">
-                                    <h3 className="text-xl font-semibold text-blue-800">
-                                        {ymdToIdDate(attendance.check_in)}
+                                    <h3 className={`text-xl font-semibold`}>
+                                        {ymdToIdDate(
+                                            journal?.date?.toString() || ""
+                                        )}
                                     </h3>
-                                    <div className="flex gap-3">
-                                        <div className="text-sm">
-                                            <span className="text-slate-500 font-semibold">
-                                                {attendance?.student?.nis}
-                                            </span>
-                                            {" - "}
-                                            <span>
-                                                {attendance?.student?.full_name}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <div className="text-sm">
-                                            Absensi Masuk{" "}
-                                            <span className="text-slate-500 font-semibold">
-                                                {ymdToIdDate(
-                                                    attendance.check_in,
-                                                    false,
-                                                    true
-                                                )}
-                                            </span>
-                                        </div>
-                                        <div className="text-sm">
-                                            Absensi Pulang{" "}
-                                            <span className="text-slate-500 font-semibold">
-                                                {attendance?.check_out
-                                                    ? ymdToIdDate(
-                                                          attendance.check_out,
-                                                          false,
-                                                          true
-                                                      )
-                                                    : "-"}
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <p className="text-base text-slate-600">
+                                        <span
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    journal.activity?.length >
+                                                    70
+                                                        ? `${journal.activity.substring(
+                                                              0,
+                                                              70
+                                                          )}...`
+                                                        : journal.activity,
+                                            }}
+                                        />
+                                    </p>
                                 </div>
                                 <ChevronRight
                                     size={28}
-                                    className="text-blue-400 z-10"
+                                    className="text-amber-400 z-10"
                                 />
-                                <div className="absolute top-0 right-0 w-1/4 h-full bg-gradient-to-l from-blue-100 to-white rounded-l-md"></div>
+                                <div className="absolute top-0 right-0 w-1/4 h-full bg-gradient-to-l from-amber-100 to-white rounded-l-md"></div>
                             </Card>
                         </Link>
                     ))

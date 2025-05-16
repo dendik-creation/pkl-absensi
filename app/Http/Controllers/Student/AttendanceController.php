@@ -238,7 +238,9 @@ class AttendanceController extends Controller
             ]);
         } elseif ($format == 'XLSX') {
             $attendances = $this->attendanceExport($student->id, $month_selected);
-            return Excel::download(new AttendanceExport($attendances, $student, $month_selected), $student->nis . '_' . 'ABSENSI' . '_' . ($month_selected == null ? 'ALL' : strtoupper(substr(Carbon::create()->month(intval($month_selected))->format('F'), 0, 3))) . '.xlsx');
+            $monthName = $month_selected ? date('F Y', mktime(0, 0, 0, $month_selected, 1)) : date('F Y');
+            $title = $month_selected ? "Absensi PKL Bulan $monthName" : "Absensi PKL Keseluruhan";
+            return Excel::download(new AttendanceExport($title ,$attendances, $student), $student->nis . '_' . 'ABSENSI' . '_' . ($month_selected == null ? 'ALL' : strtoupper(substr(Carbon::create()->month(intval($month_selected))->format('F'), 0, 3))) . '.xlsx');
         }
     }
 }
