@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Global;
 
 use App\Http\Controllers\Controller;
 use App\Models\GlobalSetting;
+use App\Models\Supervisor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -72,6 +73,11 @@ class AuthController extends Controller
     }
 
     public function signOut(){
+        $supervisor = Supervisor::where('user_id', Auth::id())->first();
+        if ($supervisor) {
+            $supervisor->fcm_token = null;
+            $supervisor->save();
+        }
         Auth::logout();
         return Inertia::location('/auth/signin');
     }

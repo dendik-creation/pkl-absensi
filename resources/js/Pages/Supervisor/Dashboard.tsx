@@ -3,6 +3,7 @@ import { MainLayout } from "@/Layouts/MainLayout";
 import {
     currentTimeCode,
     currentTimeGreeting,
+    requestNotificationPermission,
     setLocalStorage,
     ymdToIdDate,
 } from "@/Services/additionalService";
@@ -15,11 +16,12 @@ import { MenuItem } from "@/Types/menu";
 import clsx from "clsx";
 import { ApexBarChart, ChartNoData } from "@/Components/custom/Charts";
 import { useEffect, useState } from "react";
-import { Clock8, NotebookText } from "lucide-react";
+import { Bell, Clock8, NotebookText } from "lucide-react";
 import { Supervisor } from "@/Types/supervisor";
 import { FaUserGear } from "react-icons/fa6";
 import { Attendance } from "@/Types/attendance";
 import { LuMapPinCheck } from "react-icons/lu";
+import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 
 type SupervisorDashboardProps = {
     title?: string;
@@ -50,6 +52,9 @@ export default function SupervisorDashboard({
     data,
 }: SupervisorDashboardProps) {
     const [currentTime, setCurrentTime] = useState(new Date().toISOString());
+    const [grantedNotif, setGrantedNotif] = useState(
+        Notification.permission === "granted"
+    );
     setLocalStorage("user_role", data.user_role);
     setLocalStorage("default_latitude", data.default_location.latitude);
     setLocalStorage("default_longitude", data.default_location.longitude);
@@ -61,6 +66,22 @@ export default function SupervisorDashboard({
 
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        if (grantedNotif) {
+            requestNotificationPermission("supervisor");
+        }
+    }, []);
+
+    const hanldeRequestNotification = async () => {
+        const isGranted = await requestNotificationPermission("supervisor");
+        setGrantedNotif(isGranted);
+        BlastSonner({
+            message: isGranted ? "Notifikasi diizinkan" : "Notifikasi ditolak",
+            type: isGranted ? BlastType.SUCCESS : BlastType.ERROR,
+        });
+    };
+
     const menuItems: MenuItem[] = [
         {
             icon: <PiStudentFill size={24} color="#36454F" />,
@@ -171,6 +192,33 @@ export default function SupervisorDashboard({
                         </div>
                     </Card>
                 </div>
+                {!grantedNotif && (
+                    <div
+                        className="z-10 group relative mb-3 pb-3 cursor-pointer"
+                        onClick={hanldeRequestNotification}
+                    >
+                        <Card className="flex p-3 flex-row w-full relative overflow-hidden shadow-md">
+                            <div
+                                className={clsx(
+                                    "absolute -right-5 -bottom-0 w-2/3 h-full bg-gradient-to-r from-white to-yellow-200/50"
+                                )}
+                            ></div>
+                            <div
+                                className={clsx(
+                                    "z-10 absolute right-1.5 bottom-2 opacity-50 to-yellow-200/50"
+                                )}
+                            >
+                                <Bell size={35} />
+                            </div>
+                            <div className="relative z-10 p-1">
+                                <h3 className="font-medium group-hover:underline text-gray-700">
+                                    Izinkan notifikasi untuk informasi absensi
+                                    harian siswa
+                                </h3>
+                            </div>
+                        </Card>
+                    </div>
+                )}
                 <MenuListInDashboard className="mb-6" menuItems={menuItems} />
                 <div className="mt-6">
                     <div className="mb-6">

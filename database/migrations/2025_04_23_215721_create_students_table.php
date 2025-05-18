@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('class', 40)->nullable();
             $table->string('major')->nullable();
             $table->foreignId('workshop_id')->nullable()->constrained('workshops')->onDelete('set null');
+            $table->boolean('reminder_active')->default(false);
             $table->timestamps();
         });
     }

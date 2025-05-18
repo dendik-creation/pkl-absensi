@@ -1,8 +1,8 @@
-import BlastSonner, { BlastType } from "@/Components/custom/BlastSonner";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import React from "react";
+import { requestPermissionAndToken } from "./fcm_service";
 
 export const ymdToIdDate = (
     dateString: string | null | undefined,
@@ -172,18 +172,15 @@ export const clearLocalStorage = () => {
 };
 
 export const requestNotificationPermission = async (
-    from: "student" | "supervisor",
-    setGrantedNotif: React.Dispatch<React.SetStateAction<boolean>>
+    from: "student" | "supervisor"
 ): Promise<boolean> => {
     if (!("Notification" in window)) return false;
 
     const handlePermission = (permission: NotificationPermission) => {
         const isGranted = permission === "granted";
-        setGrantedNotif(isGranted);
-        BlastSonner({
-            message: isGranted ? "Notifikasi diizinkan" : "Notifikasi ditolak",
-            type: isGranted ? BlastType.SUCCESS : BlastType.ERROR,
-        });
+        if (isGranted) {
+            requestPermissionAndToken(from);
+        }
         return isGranted;
     };
 

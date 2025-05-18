@@ -79,9 +79,9 @@ class DashboardController extends Controller
     {
         $attendances = Attendance::with('student.workshop')
             ->whereHas('student', function ($query) use ($workshops_id) {
-                $query->whereIn('workshop_id', $workshops_id);
+            $query->whereIn('workshop_id', $workshops_id);
             })
-            ->latest()
+            ->orderBy('check_in', 'desc')
             ->take(5)
             ->get();
         return $attendances;
