@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\StudentController as AdminStudent;
 use App\Http\Controllers\Admin\WorkshopController as AdminWorkshop;
 use App\Http\Controllers\Admin\SupervisorController as AdminSupervisor;
 use App\Http\Controllers\Global\GlobalController;
+use App\Http\Controllers\Global\NotificationController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Student\AttendanceController as StudentAttendance;
 use App\Http\Controllers\Student\JournalController as StudentJournal;
@@ -29,6 +30,8 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::post('/firebase/update-fcm-token', [NotificationController::class, 'updateFcmToken']);
+    Route::post('/firebase/student-subscribe-reminder', [NotificationController::class, 'studentSubscribeReminder']);
     Route::post('auth/signout', [AuthController::class, 'signOut']);
 
     // Global Profile Access

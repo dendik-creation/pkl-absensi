@@ -56,7 +56,7 @@ class DashboardController extends Controller
 
     private function latestAttendances()
     {
-        $attendances = Attendance::with('student.workshop')->latest()->take(5)->get();
+        $attendances = Attendance::with('student.workshop')->orderBy('check_in', 'desc')->take(5)->get();
         return $attendances;
     }
 
