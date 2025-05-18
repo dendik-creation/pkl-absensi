@@ -26,6 +26,7 @@ class GlobalSettingSeed extends Seeder
 
             // School Identity
             'school_name' => 'SMK Negeri 1 Cluwak',
+            'school_icon' => 'assets/img/school_icon.png',
             'school_address' => 'Jl. Raya Tayu-Jepara No.KM 15, Gili Kidul, Sirahan, Kec. Cluwak, Kabupaten Pati, Jawa Tengah 59157',
             'school_phone' => '02914277788',
             'school_website' => 'www.smkn1cluwak.sch.id',
