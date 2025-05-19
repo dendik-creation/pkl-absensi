@@ -14,6 +14,7 @@ class Attendance extends Model
     const PRESENT = 'PRESENT';
     const ABSENT = 'ABSENT';
     const EXCUSED = 'EXCUSED';
+    const ATTENDANCE_REMINDER_TOPIC = 'attendance_reminder';
     protected $guarded = ['id'];
 
     public function student(){

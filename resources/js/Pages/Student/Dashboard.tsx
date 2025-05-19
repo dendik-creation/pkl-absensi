@@ -72,14 +72,10 @@ export default function StudentDashboard({
     setLocalStorage("default_longitude", setting?.default_longitude);
 
     useEffect(() => {
-        const handleNotificationPermission = async () => {
-            if (!grantedNotif) {
-                await requestNotificationPermission("student", setGrantedNotif);
-            }
-        };
-
-        handleNotificationPermission();
-    }, [grantedNotif]);
+        if (grantedNotif) {
+            requestNotificationPermission("student");
+        }
+    }, []);
 
     useEffect(() => {
         const updateCurrentTime = () => {
@@ -109,6 +105,14 @@ export default function StudentDashboard({
             url: "/student/workshop",
         },
     ];
+    const hanldeRequestNotification = async () => {
+        const isGranted = await requestNotificationPermission("student");
+        setGrantedNotif(isGranted);
+        BlastSonner({
+            message: isGranted ? "Notifikasi diizinkan" : "Notifikasi ditolak",
+            type: isGranted ? BlastType.SUCCESS : BlastType.ERROR,
+        });
+    };
     return (
         <MainLayout title={title as string}>
             <div className="w-full">
@@ -189,12 +193,7 @@ export default function StudentDashboard({
                 {!grantedNotif && (
                     <div
                         className="z-10 group relative mb-3 pb-3 cursor-pointer"
-                        onClick={() =>
-                            requestNotificationPermission(
-                                "student",
-                                setGrantedNotif
-                            )
-                        }
+                        onClick={hanldeRequestNotification}
                     >
                         <Card className="flex p-3 flex-row w-full relative overflow-hidden shadow-md">
                             <div
