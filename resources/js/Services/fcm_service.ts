@@ -57,7 +57,8 @@ export async function requestPermissionAndToken(
             });
             if (currentToken) {
                 if (from === "supervisor") await updateFCMToken(currentToken);
-                if (from === "student") await studentSubscribeReminder();
+                if (from === "student")
+                    await studentSubscribeReminder(currentToken);
             } else {
                 console.warn("No FCM token retrieved");
             }
@@ -83,7 +84,7 @@ async function updateFCMToken(token: string): Promise<void> {
     });
 }
 
-async function studentSubscribeReminder(): Promise<void> {
+async function studentSubscribeReminder(token: string): Promise<void> {
     const csrfToken = (
         document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement
     )?.content;
@@ -93,5 +94,6 @@ async function studentSubscribeReminder(): Promise<void> {
             "Content-Type": "application/json",
             "X-CSRF-TOKEN": csrfToken ?? "",
         },
+        body: JSON.stringify({ fcm_token: token }),
     });
 }
