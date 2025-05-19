@@ -98,7 +98,7 @@ class AuthController extends Controller
             if (!$student) {
                 return;
             }
-            $student->reminder_active = null;
+            $student->reminder_active = 0;
             $student->save();
         }
         Auth::logout();
