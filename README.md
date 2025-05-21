@@ -42,7 +42,7 @@ Ensure you have the following installed:
 
     ```bash
     git clone https://github.com/dendik-creation/pkl-absensi.git
-    cd pkl-absensi/server
+    cd pkl-absensi/pkl-absensi
     ```
 
 2. **Install Backend Dependencies**
