@@ -4,7 +4,7 @@ PKL Absensi is a web-based attendance application that utilizes GPS lock radius 
 
 ## Author
 
-This project is developed by [@dendik-creation](https://github.com/dendik-creation).
+This project is developed by [dendik-creation](https://github.com/dendik-creation).
 
 ## Tech Stack
 
@@ -42,7 +42,7 @@ Ensure you have the following installed:
 
     ```bash
     git clone https://github.com/dendik-creation/pkl-absensi.git
-    cd pkl-absensi/server
+    cd pkl-absensi/pkl-absensi
     ```
 
 2. **Install Backend Dependencies**
