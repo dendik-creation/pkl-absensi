@@ -4,7 +4,7 @@ PKL Absensi is a web-based attendance application that utilizes GPS lock radius 
 
 ## Author
 
-This project is developed by [@dendik-creation](https://github.com/dendik-creation).
+This project is developed by [dendik-creation](https://github.com/dendik-creation).
 
 ## Tech Stack
 
